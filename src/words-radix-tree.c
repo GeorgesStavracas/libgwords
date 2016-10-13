@@ -110,6 +110,12 @@ typedef struct
   guchar             *key;
 } Leaf;
 
+G_STATIC_ASSERT (sizeof (Node)    == 20);
+G_STATIC_ASSERT (sizeof (Node4)   == 56);
+G_STATIC_ASSERT (sizeof (Node16)  == 168);
+G_STATIC_ASSERT (sizeof (Node48)  == 664);
+G_STATIC_ASSERT (sizeof (Node256) == 2072);
+
 typedef struct
 {
   Node               *root;
