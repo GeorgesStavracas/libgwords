@@ -36,7 +36,7 @@
  * The free function is called on the data assigned to the key only if it's non-%NULL.
  */
 
-#define MAX_PREFIX_LEN 10
+#define MAX_PREFIX_LEN 12
 
 #define NODE_4         1
 #define NODE_16        2
@@ -53,11 +53,11 @@
  */
 typedef struct
 {
-  guint8              type;
-  guint8              num_children;
+  guint16             type;
+  guint16             num_children;
   guint32             partial_len;
   guchar              partial[MAX_PREFIX_LEN];
-} Node __attribute__ ((aligned (8)));
+} Node;
 
 /*
  * Small node with only 4 children
