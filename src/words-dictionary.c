@@ -224,7 +224,8 @@ words_dictionary_new (void)
  */
 gboolean
 words_dictionary_contains (WordsDictionary *self,
-                           const gchar     *word)
+                           const gchar     *word,
+                           gsize            word_length)
 {
   WordsDictionaryPrivate *priv;
 
@@ -233,13 +234,14 @@ words_dictionary_contains (WordsDictionary *self,
 
   priv = words_dictionary_get_instance_private (self);
 
-  return words_radix_tree_contains (priv->tree, word);
+  return words_radix_tree_contains (priv->tree, word, word_length);
 }
 
 /**
  * words_dictionary_insert:
  * @self: a #WordsDictionary
  * @word: a word to insert in @self
+ * @word_length: the length of @key, or -1
  *
  * Inserts @word in @self. If @word is already present, nothing
  * happens.
@@ -248,7 +250,8 @@ words_dictionary_contains (WordsDictionary *self,
  */
 void
 words_dictionary_insert (WordsDictionary *self,
-                         const gchar     *word)
+                         const gchar     *word,
+                         gsize            word_length)
 {
   WordsDictionaryPrivate *priv;
 
@@ -257,7 +260,7 @@ words_dictionary_insert (WordsDictionary *self,
 
   priv = words_dictionary_get_instance_private (self);
 
-  words_radix_tree_insert (priv->tree, word, NULL);
+  words_radix_tree_insert (priv->tree, word, word_length, NULL);
 }
 
 /**
@@ -272,7 +275,8 @@ words_dictionary_insert (WordsDictionary *self,
  */
 void
 words_dictionary_remove (WordsDictionary *self,
-                         const gchar     *word)
+                         const gchar     *word,
+                         gsize            word_length)
 {
   WordsDictionaryPrivate *priv;
 
@@ -281,7 +285,7 @@ words_dictionary_remove (WordsDictionary *self,
 
   priv = words_dictionary_get_instance_private (self);
 
-  words_radix_tree_remove (priv->tree, word);
+  words_radix_tree_remove (priv->tree, word, word_length);
 }
 
 /**
@@ -628,7 +632,7 @@ words_dictionary_load_from_gfile_sync (WordsDictionary  *self,
       if (g_cancellable_set_error_if_cancelled (cancellable, error))
         break;
 
-      words_dictionary_insert (self, split_content[i]);
+      words_dictionary_insert (self, split_content[i], -1);
     }
 
   g_clear_pointer (&split_content, g_strfreev);

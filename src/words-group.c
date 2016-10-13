@@ -92,6 +92,7 @@ words_group_unref (WordsGroup *self)
  * words_group_insert_word:
  * @self: a #WordsGroup
  * @word: a word to be added to @self
+ * @word_length: length of @word, or -1
  *
  * Inserts @word in @self. If the word is already there, this does nothing.
  *
@@ -99,15 +100,17 @@ words_group_unref (WordsGroup *self)
  */
 void
 words_group_insert_word (WordsGroup  *self,
-                         const gchar *word)
+                         const gchar *word,
+                         gsize        word_length)
 {
-  words_radix_tree_insert (self->words, word, NULL);
+  words_radix_tree_insert (self->words, word, word_length, NULL);
 }
 
 /**
  * words_group_remove_word:
  * @self: a #WordsGroup
  * @word: a word to be removed from @self
+ * @word_length: length of @word, or -1
  *
  * Removes @word from @self. If the word is not there, this does nothing.
  *
@@ -115,15 +118,17 @@ words_group_insert_word (WordsGroup  *self,
  */
 void
 words_group_remove_word (WordsGroup  *self,
-                         const gchar *word)
+                         const gchar *word,
+                         gsize        word_length)
 {
-  words_radix_tree_remove (self->words, word);
+  words_radix_tree_remove (self->words, word, word_length);
 }
 
 /**
  * words_group_contains_word:
  * @self: a #WordsGroup
  * @word: a word to be search in @self
+ * @word_length: length of @word, or -1
  *
  * Checks if @word is in @self.
  *
@@ -133,9 +138,10 @@ words_group_remove_word (WordsGroup  *self,
  */
 gboolean
 words_group_contains_word (WordsGroup  *self,
-                           const gchar *word)
+                           const gchar *word,
+                           gsize        word_length)
 {
-  return words_radix_tree_contains (self->words, word);
+  return words_radix_tree_contains (self->words, word, word_length);
 }
 
 /**

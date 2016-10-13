@@ -38,13 +38,16 @@ WordsGroup*          words_group_ref                             (WordsGroup    
 void                 words_group_unref                           (WordsGroup         *self);
 
 void                 words_group_insert_word                     (WordsGroup         *self,
-                                                                  const gchar        *word);
+                                                                  const gchar        *word,
+                                                                  gsize               word_length);
 
 void                 words_group_remove_word                     (WordsGroup         *self,
-                                                                  const gchar        *word);
+                                                                  const gchar        *word,
+                                                                  gsize               word_length);
 
 gboolean             words_group_contains_word                   (WordsGroup         *self,
-                                                                  const gchar        *word);
+                                                                  const gchar        *word,
+                                                                  gsize               word_length);
 
 GStrv                words_group_get_words                       (WordsGroup         *self);
 

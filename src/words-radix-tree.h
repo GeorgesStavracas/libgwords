@@ -47,14 +47,17 @@ WordsRadixTree*      words_radix_tree_new                        (void);
 WordsRadixTree*      words_radix_tree_new_with_free_func         (GDestroyNotify      destroy_func);
 
 gboolean             words_radix_tree_contains                   (WordsRadixTree     *tree,
-                                                                  const gchar        *key);
+                                                                  const gchar        *key,
+                                                                  gsize               key_length);
 
 gpointer             words_radix_tree_lookup                     (WordsRadixTree     *tree,
                                                                   const gchar        *key,
+                                                                  gsize               key_length,
                                                                   gboolean           *found);
 
 gboolean             words_radix_tree_insert                     (WordsRadixTree     *tree,
                                                                   const gchar        *key,
+                                                                  gsize               key_length,
                                                                   gpointer            value);
 
 void                 words_radix_tree_clear                      (WordsRadixTree     *tree);
@@ -70,10 +73,12 @@ GStrv                words_radix_tree_get_keys                   (WordsRadixTree
 GPtrArray*           words_radix_tree_get_values                 (WordsRadixTree     *tree);
 
 void                 words_radix_tree_remove                     (WordsRadixTree     *tree,
-                                                                  const gchar        *key);
+                                                                  const gchar        *key,
+                                                                  gsize               key_length);
 
 void                 words_radix_tree_steal                      (WordsRadixTree     *tree,
-                                                                  const gchar        *key);
+                                                                  const gchar        *key,
+                                                                  gsize               key_length);
 
 G_END_DECLS
 

@@ -1272,6 +1272,7 @@ words_radix_tree_new_with_free_func (GDestroyNotify destroy_func)
  * words_radix_tree_contains:
  * @self: a #WordsRadixTree
  * @key: the key to search for.
+ * @key_length: the length of @key, or -1
  *
  * Checks if @self contains @key.
  *
@@ -1281,13 +1282,14 @@ words_radix_tree_new_with_free_func (GDestroyNotify destroy_func)
  */
 gboolean
 words_radix_tree_contains (WordsRadixTree *self,
-                           const gchar    *key)
+                           const gchar    *key,
+                           gsize           key_length)
 {
   gboolean found;
 
   g_return_val_if_fail (WORDS_IS_RADIX_TREE (self), FALSE);
 
-  words_radix_tree_lookup (self, key, &found);
+  words_radix_tree_lookup (self, key, key_length, &found);
 
   return found;
 }
@@ -1296,6 +1298,7 @@ words_radix_tree_contains (WordsRadixTree *self,
  * words_radix_tree_lookup:
  * @tree: a #WordsRadixTree
  * @key: the key to look for
+ * @key_length: the length of @key, or -1
  * @found: whether the value was found or not
  *
  * Look for the given key on the tree, and return it's associated value.
@@ -1309,19 +1312,22 @@ words_radix_tree_contains (WordsRadixTree *self,
 gpointer
 words_radix_tree_lookup (WordsRadixTree *self,
                          const gchar    *key,
+                         gsize           key_length,
                          gboolean       *found)
 {
   WordsRadixTreePrivate *priv;
   Node **child;
   Node *n;
-  gint depth, key_len;
+  gint depth;
 
   g_return_val_if_fail (WORDS_IS_RADIX_TREE (self), NULL);
 
   priv = words_radix_tree_get_instance_private (self);
   n = priv->root;
   depth = 0;
-  key_len = strlen (key);
+
+  if (key_length == -1)
+    key_length = strlen (key);
 
   while (n)
     {
@@ -1329,7 +1335,7 @@ words_radix_tree_lookup (WordsRadixTree *self,
         {
           n = (Node*) LEAF_RAW (n);
 
-          if (leaf_matches ((Leaf*) n, (guchar*) key, key_len))
+          if (leaf_matches ((Leaf*) n, (guchar*) key, key_length))
             return ((Leaf*) n)->value;
 
           return NULL;
@@ -1340,7 +1346,7 @@ words_radix_tree_lookup (WordsRadixTree *self,
         {
           gint prefix_len;
 
-          prefix_len = check_prefix (n, (guchar*) key, key_len, depth);
+          prefix_len = check_prefix (n, (guchar*) key, key_length, depth);
 
           if (prefix_len != MIN (MAX_PREFIX_LEN, n->partial_len))
             return NULL;
@@ -1361,6 +1367,7 @@ words_radix_tree_lookup (WordsRadixTree *self,
  * words_radix_tree_insert:
  * @tree: the #WordsRadixTree to add to
  * @key: string user as identifier of the value. Must be a UTF-8 valid string.
+ * @key_length: the length of @key, or -1
  * @value: (nullable): user data to be stored. Can be %NULL.
  *
  * Inserts a new value in the @tree. If the key is already in the tree, @value
@@ -1373,6 +1380,7 @@ words_radix_tree_lookup (WordsRadixTree *self,
 gboolean
 words_radix_tree_insert (WordsRadixTree *self,
                          const gchar    *key,
+                         gsize           key_length,
                          gpointer        value)
 {
   WordsRadixTreePrivate *priv;
@@ -1387,7 +1395,7 @@ words_radix_tree_insert (WordsRadixTree *self,
   old_val = insert_recursive (priv->root,
                               &(priv->root),
                               (const guchar*) key,
-                              strlen (key),
+                              key_length == -1 ? strlen (key) : key_length,
                               value,
                               0,
                               &old);
@@ -1478,6 +1486,7 @@ words_radix_tree_iter (WordsRadixTree *self,
  * words_radix_tree_remove:
  * @tree: the #WordsRadixTree
  * @key: the key to be removed. Must be UTF-8 valid.
+ * @key_length: the length of @key, or -1
  *
  * Removes the given key from the tree. The key must be
  * a UTF-8 validated string.
@@ -1486,7 +1495,8 @@ words_radix_tree_iter (WordsRadixTree *self,
  */
 void
 words_radix_tree_remove (WordsRadixTree *self,
-                         const gchar    *key)
+                         const gchar    *key,
+                         gsize           key_length)
 {
   WordsRadixTreePrivate *priv;
   Leaf *removed;
@@ -1497,7 +1507,7 @@ words_radix_tree_remove (WordsRadixTree *self,
   removed = remove_recursive (priv->root,
                               &priv->root,
                               (guchar*) key,
-                              strlen (key),
+                              key_length == -1 ? strlen (key) : key_length,
                               0);
 
   if (removed)
@@ -1515,6 +1525,7 @@ words_radix_tree_remove (WordsRadixTree *self,
  * words_radix_tree_steal:
  * @tree: the #WordsRadixTree
  * @key: the key to be removed. Must be UTF-8 valid.
+ * @key_length: the length of @key, or -1
  *
  * Removes the given key from the tree without calling the destroy
  * function if any.
@@ -1523,7 +1534,8 @@ words_radix_tree_remove (WordsRadixTree *self,
  */
 void
 words_radix_tree_steal (WordsRadixTree *self,
-                        const gchar    *key)
+                        const gchar    *key,
+                        gsize           key_length)
 {
   WordsRadixTreePrivate *priv;
   Leaf *removed;
@@ -1534,7 +1546,7 @@ words_radix_tree_steal (WordsRadixTree *self,
   removed = remove_recursive (priv->root,
                               &priv->root,
                               (guchar*) key,
-                              strlen (key),
+                              key_length == -1 ? strlen (key) : key_length,
                               0);
 
   if (removed)

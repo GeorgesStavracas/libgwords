@@ -36,13 +36,16 @@ struct _WordsDictionaryClass
 WordsDictionary*     words_dictionary_new                        (void);
 
 gboolean             words_dictionary_contains                   (WordsDictionary    *self,
-                                                                  const gchar        *word);
+                                                                  const gchar        *word,
+                                                                  gsize               word_length);
 
 void                 words_dictionary_insert                     (WordsDictionary    *self,
-                                                                  const gchar        *word);
+                                                                  const gchar        *word,
+                                                                  gsize               word_length);
 
 void                 words_dictionary_remove                     (WordsDictionary    *self,
-                                                                  const gchar        *word);
+                                                                  const gchar        *word,
+                                                                  gsize               word_length);
 
 void                 words_dictionary_load_from_file             (WordsDictionary     *self,
                                                                   const gchar         *file_path,
