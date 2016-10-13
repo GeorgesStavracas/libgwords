@@ -36,7 +36,7 @@
  * The free function is called on the data assigned to the key only if it's non-%NULL.
  */
 
-#define MAX_PREFIX_LEN 12
+#define MAX_PREFIX_LEN 8
 
 #define NODE_4         1
 #define NODE_16        2
