@@ -62,7 +62,7 @@ typedef struct
 /*
  * Small node with only 4 children
  */
-typedef struct
+typedef struct __attribute__ ((packed))
 {
   Node                n;
   guchar              keys[4];
