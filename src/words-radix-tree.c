@@ -137,7 +137,7 @@ static GParamSpec *properties [N_PROPS] = { NULL, };
  * Internal functions
  */
 /* callbacks */
-static gboolean
+static inline gboolean
 get_keys_cb (const gchar *key,
              gpointer     value,
              gpointer     user_data)
@@ -149,7 +149,7 @@ get_keys_cb (const gchar *key,
   return WORDS_RADIX_TREE_ITER_STOP;
 }
 
-static gboolean
+static inline gboolean
 get_values_cb (const gchar *key,
                gpointer     value,
                gpointer     user_data)
