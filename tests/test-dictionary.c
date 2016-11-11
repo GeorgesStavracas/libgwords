@@ -40,7 +40,7 @@ dictionary_insert (void)
     {
       gchar *str = g_strdup_printf ("test%d", i);
 
-      words_dictionary_insert (dict, str);
+      words_dictionary_insert (dict, str, -1);
 
       g_free (str);
     }
@@ -60,7 +60,7 @@ dictionary_remove (void)
     {
       gchar *str = g_strdup_printf ("test%d", i);
 
-      words_dictionary_insert (dict, str);
+      words_dictionary_insert (dict, str, -1);
 
       g_free (str);
     }
@@ -69,7 +69,7 @@ dictionary_remove (void)
     {
       gchar *str = g_strdup_printf ("test%d", i);
 
-      words_dictionary_remove (dict, str);
+      words_dictionary_remove (dict, str, -1);
 
       g_free (str);
     }

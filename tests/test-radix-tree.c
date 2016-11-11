@@ -35,11 +35,11 @@ radix_tree_low_entries (void)
 
   tree = words_radix_tree_new ();
 
-  words_radix_tree_insert (tree, "Albums", NULL);
-  words_radix_tree_insert (tree, "Music", NULL);
-  words_radix_tree_insert (tree, "Test", NULL);
-  words_radix_tree_insert (tree, "Firefox", NULL);
-  words_radix_tree_insert (tree, "Yay", NULL);
+  words_radix_tree_insert (tree, "Albums", -1, NULL);
+  words_radix_tree_insert (tree, "Music", -1, NULL);
+  words_radix_tree_insert (tree, "Test", -1, NULL);
+  words_radix_tree_insert (tree, "Firefox", -1, NULL);
+  words_radix_tree_insert (tree, "Yay", -1, NULL);
 
   g_clear_object (&tree);
 }
@@ -57,7 +57,7 @@ radix_tree_many_entries (void)
       gchar *key;
 
       key = g_strdup_printf ("Test%d", i);
-      words_radix_tree_insert (tree, key, NULL);
+      words_radix_tree_insert (tree, key, -1, NULL);
 
       g_free (key);
     }
