@@ -18,6 +18,8 @@
 
 #include "words.h"
 
+#include <time.h>
+
 static void
 radix_tree_init (void)
 {
@@ -45,24 +47,47 @@ radix_tree_low_entries (void)
 }
 
 static void
-radix_tree_many_entries (void)
+radix_tree_n_entries (guint n)
 {
   WordsRadixTree *tree;
+  clock_t begin, end;
+  gdouble spent;
+  gchar key[20] = { '\0', };
   gint i;
 
+  begin = clock ();
   tree = words_radix_tree_new ();
 
-  for (i = 0; i < 1000000; i++)
+  for (i = 0; i < n; i++)
     {
-      gchar *key;
-
-      key = g_strdup_printf ("Test%d", i);
+      g_snprintf (key, 20, "test%d", i);
       words_radix_tree_insert (tree, key, -1, NULL);
-
-      g_free (key);
     }
 
   g_clear_object (&tree);
+
+  end = clock ();
+  spent = (gdouble) (end - begin) / CLOCKS_PER_SEC;
+
+  g_print ("%8d elements - execution time: %lf \n", n, spent);
+}
+
+static void
+radix_tree_many_entries (void)
+{
+  guint i;
+  guint entries[] = {
+    10,
+    1000,
+    100000,
+    1000000,
+    10000000
+  };
+
+  g_print ("\n");
+
+  for (i = 0; i < G_N_ELEMENTS (entries); i++)
+    radix_tree_n_entries (entries[i]);
 }
 
 gint
