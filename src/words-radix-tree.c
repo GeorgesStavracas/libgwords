@@ -46,6 +46,7 @@
 #define IS_LEAF(x)     (((guintptr) x & 1))
 #define SET_LEAF(x)    ((gpointer)((guintptr) x | 1))
 #define LEAF_RAW(x)    ((Leaf*)((gpointer)((guintptr) x & ~1)))
+#define LEAF_KEY(x)    (G_STRUCT_MEMBER_P (x, G_STRUCT_OFFSET (Leaf, key)))
 
 /*
  * This struct is included as part
@@ -107,7 +108,7 @@ typedef struct
 {
   gpointer            value;
   guint32             key_len;
-  guchar             *key;
+  guchar              key;
 } Leaf;
 
 G_STATIC_ASSERT (sizeof (Node)    == 16);
@@ -177,7 +178,7 @@ node_new (guint8 type)
       break;
 
     case NODE_16:
-      n = g_malloc0 (sizeof (Node16));;
+      n = g_malloc0 (sizeof (Node16));
       break;
 
     case NODE_48:
@@ -203,15 +204,17 @@ leaf_new (const guchar *key,
           gpointer      value)
 {
   Leaf *l;
+  guchar *lkey;
 
-  l = (Leaf*) g_new0 (Leaf, 1);
+  l = (Leaf*) g_malloc (sizeof (Leaf) + key_len * sizeof (guchar));
 
   /* TODO: optimize Leaf creation by shriking it to one non-zero malloc */
-  l->key = g_malloc0 (key_len * sizeof (guchar) + 1);
   l->value = value;
   l->key_len = key_len;
+  lkey = LEAF_KEY (l);
+  lkey[key_len] = '\0';
 
-  memcpy (l->key, key, key_len);
+  memcpy (lkey, key, key_len);
 
   return l;
 }
@@ -379,7 +382,7 @@ leaf_matches (const Leaf   *n,
   if (n->key_len != (guint32) key_len)
     return FALSE;
 
-  return memcmp (n->key, key, key_len) != 0;
+  return memcmp (LEAF_KEY (n), key, key_len) != 0;
 }
 
 
@@ -394,9 +397,11 @@ longest_common_prefix (Leaf *l1,
 
   for (i = 0; i < max_cmp; i++)
     {
+      guchar *key1 = LEAF_KEY (l1);
+      guchar *key2 = LEAF_KEY (l2);
       gint k = depth + i;
 
-      if (l1->key[k] != l2->key[k])
+      if (key1[k] != key2[k])
           return i;
     }
 
@@ -451,14 +456,16 @@ prefix_mismatch (const Node   *n,
   if (n->partial_len > MAX_PREFIX_LEN)
     {
       Leaf *leaf;
+      guchar *leaf_key;
 
       /* Prefix is longer than what we've checked, find a leaf */
       leaf = minimum (n);
+      leaf_key = LEAF_KEY (leaf);
       max_cmp = MIN (leaf->key_len, key_len) - depth;
 
       for (; i < max_cmp; i++)
         {
-          if (leaf->key[depth + i] != key[depth + i])
+          if (leaf_key[depth + i] != key[depth + i])
             return i;
         }
     }
@@ -694,6 +701,7 @@ insert_recursive (Node          *n,
       Node4 *new_node;
       Leaf *leaf, *new_leaf;
       gint longest_prefix;
+      guchar *leaf_key;
 
       leaf = LEAF_RAW (n);
 
@@ -728,14 +736,16 @@ insert_recursive (Node          *n,
       /* Add the leafs to the new Node4 */
       *ref = (Node*) new_node;
 
+      leaf_key = LEAF_KEY (leaf);
       add_child_4 (new_node,
                    ref,
-                   leaf->key[depth + longest_prefix],
+                   leaf_key[depth + longest_prefix],
                    SET_LEAF (leaf));
 
+      leaf_key = LEAF_KEY (new_leaf);
       add_child_4 (new_node,
                    ref,
-                   new_leaf->key[depth + longest_prefix],
+                   leaf_key[depth + longest_prefix],
                    SET_LEAF (new_leaf));
 
       return NULL;
@@ -771,14 +781,16 @@ insert_recursive (Node          *n,
       if (n->partial_len > MAX_PREFIX_LEN)
         {
           Leaf *leaf;
+          guchar *leaf_key;
 
           n->partial_len -= prefix_diff + 1;
           leaf = minimum (n);
+          leaf_key = LEAF_KEY (leaf);
 
-          add_child_4 (new_node, ref, leaf->key[depth + prefix_diff], n);
+          add_child_4 (new_node, ref, leaf_key[depth + prefix_diff], n);
 
           memcpy (n->partial,
-                  leaf->key + depth + prefix_diff + 1,
+                  leaf_key + depth + prefix_diff + 1,
                   MIN (MAX_PREFIX_LEN, n->partial_len));
 
         }
@@ -1102,7 +1114,7 @@ iter_recursive (Node        *n,
   if (IS_LEAF (n))
     {
       Leaf *l = LEAF_RAW(n);
-      return cb (user_data, l->key, l->value);
+      return cb (user_data, LEAF_KEY (l), l->value);
     }
 
   switch (n->type)
