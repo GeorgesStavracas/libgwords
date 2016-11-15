@@ -207,10 +207,9 @@ leaf_new (const guchar *key,
   guchar *lkey;
 
   l = (Leaf*) g_malloc (sizeof (Leaf) + key_len * sizeof (guchar));
-
-  /* TODO: optimize Leaf creation by shriking it to one non-zero malloc */
   l->value = value;
   l->key_len = key_len;
+
   lkey = LEAF_KEY (l);
   lkey[key_len] = '\0';
 
@@ -330,7 +329,7 @@ find_child (Node   *n,
     case NODE_4:
         n4 = (Node4*) n;
 
-        for (i=0;i < n->num_children; i++)
+        for (i = 0; i < n->num_children; i++)
           {
             if (n4->keys[i] == c)
               return &n4->children[i];
