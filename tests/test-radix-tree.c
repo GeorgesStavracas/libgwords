@@ -50,26 +50,41 @@ static void
 radix_tree_n_entries (guint n)
 {
   WordsRadixTree *tree;
-  clock_t begin, end;
-  gdouble spent;
+  gdouble sum;
   gchar key[20] = { '\0', };
-  gint i;
+  gint i, n_iterations;
 
-  begin = clock ();
   tree = words_radix_tree_new ();
+  sum = 0;
+  n_iterations = 10000000 / n;
 
-  for (i = 0; i < n; i++)
+  for (i = 0; i < n_iterations; i++)
     {
-      g_snprintf (key, 20, "test%d", i);
-      words_radix_tree_insert (tree, key, -1, NULL);
+      clock_t begin, end;
+      gdouble spent;
+      gint j;
+
+      begin = clock ();
+
+      for (j = 0; j < n; j++)
+        {
+          g_snprintf (key, 20, "test%d", j);
+          words_radix_tree_insert (tree, key, -1, NULL);
+        }
+
+      words_radix_tree_clear (tree);
+
+      end = clock ();
+      spent = (gdouble) (end - begin) / CLOCKS_PER_SEC;
+
+      sum += spent;
     }
 
   g_clear_object (&tree);
 
-  end = clock ();
-  spent = (gdouble) (end - begin) / CLOCKS_PER_SEC;
+  sum = sum / n_iterations;
 
-  g_print ("%8d elements - execution time: %lf \n", n, spent);
+  g_print ("%8d elements - average execution time: %lf (%d iterations)\n", n, sum, n_iterations);
 }
 
 static void
