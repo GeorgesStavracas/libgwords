@@ -1112,8 +1112,8 @@ iter_recursive (Node        *n,
 
   if (IS_LEAF (n))
     {
-      Leaf *l = LEAF_RAW(n);
-      return cb (user_data, LEAF_KEY (l), l->value);
+      Leaf *l = LEAF_RAW (n);
+      return cb (LEAF_KEY (l), l->value, user_data);
     }
 
   switch (n->type)
