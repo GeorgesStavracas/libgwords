@@ -105,6 +105,46 @@ radix_tree_many_entries (void)
     radix_tree_n_entries (entries[i]);
 }
 
+/**************************************************************************************************/
+
+static gboolean
+iter_cb (const gchar *key,
+         gpointer     value,
+         gpointer     user_data)
+{
+  const gchar* const *entries = user_data;
+
+  g_assert (g_strv_contains (entries, key));
+
+  return WORDS_RADIX_TREE_ITER_CONTINUE;
+}
+
+static void
+radix_tree_iteration (void)
+{
+  WordsRadixTree *tree;
+  gint i;
+
+  const gchar* entries[] = {
+    "firefox",
+    "planet",
+    "ore monogatari",
+    "ergo proxy",
+    "space cowboy",
+    "test",
+    NULL
+  };
+
+  tree = words_radix_tree_new ();
+
+  for (i = 0; entries[i]; i++)
+    words_radix_tree_insert (tree, entries[i], -1, NULL);
+
+  words_radix_tree_iter (tree, iter_cb, entries);
+
+  g_clear_object (&tree);
+}
+
 gint
 main (gint   argc,
       gchar *argv[])
@@ -114,6 +154,7 @@ main (gint   argc,
   g_test_add_func ("/radix-tree/init", radix_tree_init);
   g_test_add_func ("/radix-tree/low_entries", radix_tree_low_entries);
   g_test_add_func ("/radix-tree/many_entries", radix_tree_many_entries);
+  g_test_add_func ("/radix-tree/iteration", radix_tree_iteration);
 
   return g_test_run ();
 }
