@@ -20,6 +20,8 @@
 
 #include <time.h>
 
+/**************************************************************************************************/
+
 static void
 radix_tree_init (void)
 {
@@ -29,6 +31,8 @@ radix_tree_init (void)
 
   g_clear_object (&tree);
 }
+
+/**************************************************************************************************/
 
 static void
 radix_tree_low_entries (void)
@@ -45,6 +49,8 @@ radix_tree_low_entries (void)
 
   g_clear_object (&tree);
 }
+
+/**************************************************************************************************/
 
 static void
 radix_tree_n_entries (guint n)
@@ -145,6 +151,47 @@ radix_tree_iteration (void)
   g_clear_object (&tree);
 }
 
+/**************************************************************************************************/
+
+static gboolean
+utf8_iter_cb (const gchar *key,
+              gpointer     value,
+              gpointer     user_data)
+{
+  const gchar* const *entries = user_data;
+
+  g_assert (g_strv_contains (entries, key));
+
+  return WORDS_RADIX_TREE_ITER_CONTINUE;
+}
+
+static void
+radix_tree_utf8 (void)
+{
+  WordsRadixTree *tree;
+  gint i;
+
+  const gchar* entries[] = {
+    "Ħểłłỡ שׂờŕłđ",
+    "子犬",
+    "中文",
+    "Tiếng Việt, còn gọi",
+    "В'єтнамська мова",
+    NULL
+  };
+
+  tree = words_radix_tree_new ();
+
+  for (i = 0; entries[i]; i++)
+    words_radix_tree_insert (tree, entries[i], -1, NULL);
+
+  words_radix_tree_iter (tree, utf8_iter_cb, entries);
+
+  g_clear_object (&tree);
+}
+
+/**************************************************************************************************/
+
 gint
 main (gint   argc,
       gchar *argv[])
@@ -155,6 +202,7 @@ main (gint   argc,
   g_test_add_func ("/radix-tree/low_entries", radix_tree_low_entries);
   g_test_add_func ("/radix-tree/many_entries", radix_tree_many_entries);
   g_test_add_func ("/radix-tree/iteration", radix_tree_iteration);
+  g_test_add_func ("/radix-tree/utf8", radix_tree_utf8);
 
   return g_test_run ();
 }
