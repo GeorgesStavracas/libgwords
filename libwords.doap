@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+         xmlns:foaf="http://xmlns.com/foaf/0.1/"
+         xmlns:gnome="http://api.gnome.org/doap-extensions#"
+         xmlns="http://usefulinc.com/ns/doap#">
+
+  <name xml:lang="en">libpeas</name>
+  <shortdesc xml:lang="en">A GObject-based word handling library</shortdesc>
+  <description>libwords is a GObject-based library to handle words, dictionaries
+    and text structures, designed to be extended to allow high-quality natural
+    language text processing.</description>
+  <homepage rdf:resource="https://github.com/GeorgesStavracas/libwords" />
+  <download-page rdf:resource="https://github.com/GeorgesStavracas/libwords/releases" />
+  <bug-database rdf:resource="https://github.com/GeorgesStavracas/libwords/issues" />
+  <category rdf:resource="http://api.gnome.org/doap-extensions#core" />
+  <programming-language>C</programming-language>
+
+  <maintainer>
+    <foaf:Person>
+      <foaf:name>Georges Basile Stavracas Neto</foaf:name>
+      <foaf:mbox rdf:resource="mailto:gbsneto@gnome.org" />
+      <gnome:userid>feaneron</gnome:userid>
+    </foaf:Person>
+  </maintainer>
+</Project>
+
