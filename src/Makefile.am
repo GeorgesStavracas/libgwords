@@ -7,6 +7,8 @@ libwords_@API_VERSION@_la_SOURCES = \
 	words-group.h \
 	words-radix-tree.c \
 	words-radix-tree.h \
+	words-segmenter.c \
+	words-segmenter.h \
 	words-version.h \
 	words.h \
 	$(NULL)
