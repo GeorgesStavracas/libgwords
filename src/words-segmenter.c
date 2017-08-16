@@ -22,6 +22,25 @@
 G_DEFINE_INTERFACE (WordsSegmenter, words_segmenter, G_TYPE_OBJECT)
 
 static void
+segment_in_thread_cb (GTask        *task,
+                      gpointer      source_object,
+                      gpointer      task_data,
+                      GCancellable *cancellable)
+{
+  GError *local_error = NULL;
+
+  words_segmenter_segment_sync (source_object, cancellable, &local_error);
+
+  if (local_error)
+    {
+      g_task_return_error (task, local_error);
+      return;
+    }
+
+  g_task_return_boolean (task, TRUE);
+}
+
+static void
 words_segmenter_default_init (WordsSegmenterInterface *iface)
 {
 }
@@ -67,21 +86,76 @@ words_segmenter_set_text (WordsSegmenter *self,
 /**
  * words_segmenter_segment:
  * @self: a #WordsSegmenter
+ * @callback: (): callback to call when the operation is done
+ * @cancellable: (nullable): cancellable to cancel the operation
+ * @user_data:
  *
- * Segments the text. This is a blocking method and should
- * run inside a @GTask.
+ * Segments the text stored in @self asynchronously.
+ *
+ * Since: 0.1.0
+ */
+void
+words_segmenter_segment (WordsSegmenter      *self,
+                         GAsyncReadyCallback  callback,
+                         GCancellable        *cancellable,
+                         gpointer             user_data)
+{
+  GTask *task;
+
+  g_return_if_fail (WORDS_IS_SEGMENTER (self));
+  g_return_if_fail (words_segmenter_get_text (self) != NULL);
+
+  task = g_task_new (self, cancellable, callback, user_data);
+
+  g_task_run_in_thread (task, segment_in_thread_cb);
+}
+
+/**
+ * words_segmenter_segment_finish:
+ * @result: a #GAsyncResult
+ * @error: (nullable): return location for a #GError
+ *
+ * Finishes the segmentation operation started by words_segmenter_segment().
+ *
+ * Returns: %TRUE for success or %FALSE for failure.
  *
  * Since: 0.1.0
  */
 gboolean
-words_segmenter_segment (WordsSegmenter  *self,
-                         GError         **error)
+words_segmenter_segment_finish (GAsyncResult  *result,
+                                GError       **error)
+{
+  g_return_val_if_fail (G_IS_TASK (result), FALSE);
+  g_return_val_if_fail (!error || !*error, FALSE);
+
+  return g_task_propagate_boolean (G_TASK (result), error);
+}
+
+/**
+ * words_segmenter_segment:
+ * @self: a #WordsSegmenter
+ * @cancellable: (nullable): a #GCancellable
+ * @error: (nullable): return location for the error
+ *
+ * Segments the text. This is a blocking method and should
+ * run inside a @GTask.
+ *
+ * See words_segmenter_segment() for the asynchronous version.
+ *
+ * Returns: %TRUE on success or %FALSE on failure.
+ *
+ * Since: 0.1.0
+ */
+gboolean
+words_segmenter_segment_sync (WordsSegmenter  *self,
+                              GCancellable    *cancellable,
+                              GError         **error)
 {
   g_return_val_if_fail (!error || !*error, FALSE);
   g_return_val_if_fail (WORDS_IS_SEGMENTER (self), FALSE);
   g_return_val_if_fail (WORDS_SEGMENTER_GET_IFACE (self)->segment, FALSE);
 
-  return WORDS_SEGMENTER_GET_IFACE (self)->segment (self, error);
+  return WORDS_SEGMENTER_GET_IFACE (self)->segment (self, cancellable, error);
 }
 
 /**

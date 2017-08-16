@@ -20,6 +20,7 @@
 #define WORDS_SEGMENTER_H
 
 #include <glib-object.h>
+#include <gio/gio.h>
 
 G_BEGIN_DECLS
 
@@ -37,6 +38,7 @@ struct _WordsSegmenterInterface
                                                                   const gchar        *text);
 
   gboolean           (*segment)                                  (WordsSegmenter     *self,
+                                                                  GCancellable       *cancellable,
                                                                   GError            **error);
 
   GStrv              (*get_words)                                (WordsSegmenter     *self);
@@ -47,7 +49,16 @@ const gchar*         words_segmenter_get_text                    (WordsSegmenter
 void                 words_segmenter_set_text                    (WordsSegmenter     *self,
                                                                   const gchar        *text);
 
-gboolean             words_segmenter_segment                     (WordsSegmenter     *self,
+void                 words_segmenter_segment                     (WordsSegmenter     *self,
+                                                                  GAsyncReadyCallback callback,
+                                                                  GCancellable       *cancellable,
+                                                                  gpointer            user_data);
+
+gboolean             words_segmenter_segment_finish              (GAsyncResult       *result,
+                                                                  GError            **error);
+
+gboolean             words_segmenter_segment_sync                (WordsSegmenter     *self,
+                                                                  GCancellable       *cancellable,
                                                                   GError            **error);
 
 GStrv                words_segmenter_get_words                   (WordsSegmenter     *self);
