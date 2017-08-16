@@ -5,7 +5,7 @@
          xmlns:gnome="http://api.gnome.org/doap-extensions#"
          xmlns="http://usefulinc.com/ns/doap#">
 
-  <name xml:lang="en">libpeas</name>
+  <name xml:lang="en">libwords</name>
   <shortdesc xml:lang="en">A GObject-based word handling library</shortdesc>
   <description>libwords is a GObject-based library to handle words, dictionaries
     and text structures, designed to be extended to allow high-quality natural
