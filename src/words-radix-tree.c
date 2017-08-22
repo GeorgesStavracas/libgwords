@@ -96,8 +96,8 @@ typedef struct
  */
 typedef struct
 {
-    Node              n;
-    Node             *children[256];
+  Node                n;
+  Node               *children[256];
 } Node256;
 
 /**
@@ -126,7 +126,8 @@ typedef struct
 
 G_DEFINE_TYPE_WITH_PRIVATE (WordsRadixTree, words_radix_tree, G_TYPE_OBJECT)
 
-enum {
+enum
+{
   PROP_0,
   PROP_SIZE,
   N_PROPS
@@ -137,6 +138,7 @@ static GParamSpec *properties [N_PROPS] = { NULL, };
 /*
  * Internal functions
  */
+
 /* callbacks */
 static inline gboolean
 get_keys_cb (const gchar *key,
