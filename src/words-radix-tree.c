@@ -1446,6 +1446,9 @@ words_radix_tree_get_keys (WordsRadixTree *self)
 
   words_radix_tree_iter (self, get_keys_cb, result);
 
+  /* Tail NULL */
+  g_ptr_array_add (result, NULL);
+
   return (GStrv) g_ptr_array_free (result, FALSE);
 }
 
