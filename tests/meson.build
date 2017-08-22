@@ -9,6 +9,18 @@ configure_file(
   configuration: configuration_data()
 )
 
+#################
+# test-config.h #
+#################
+
+test_conf = configuration_data()
+test_conf.set_quoted('TESTDIR', join_paths(meson.build_root(), 'tests'))
+
+configure_file(
+         output: 'test-config.h',
+  configuration: test_conf
+)
+
 
 ##############
 # Dictionary #
