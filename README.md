@@ -20,6 +20,7 @@ Libwords aims to provide the following funtionality:
  - [ ] Root extractor
  - [ ] Word conjugation
  - [ ] String iteration
+ - [ ] Synonims and antonyms
 
 ## Roadmap
 
