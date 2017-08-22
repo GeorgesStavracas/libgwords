@@ -39,6 +39,7 @@ struct _WordsRadixTreeClass
  * Returns %TRUE to stop, %FALSE to continue.
  */
 typedef gboolean     (*RadixTreeCb)                               (const gchar       *key,
+								   gsize              key_length,
                                                                    gpointer           value,
                                                                    gpointer           user_data);
 

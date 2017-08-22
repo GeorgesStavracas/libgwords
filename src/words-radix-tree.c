@@ -142,6 +142,7 @@ static GParamSpec *properties [N_PROPS] = { NULL, };
 /* callbacks */
 static inline gboolean
 get_keys_cb (const gchar *key,
+             gsize        key_length,
              gpointer     value,
              gpointer     user_data)
 {
@@ -154,6 +155,7 @@ get_keys_cb (const gchar *key,
 
 static inline gboolean
 get_values_cb (const gchar *key,
+               gsize        key_length,
                gpointer     value,
                gpointer     user_data)
 {
@@ -1115,7 +1117,7 @@ iter_recursive (Node        *n,
   if (IS_LEAF (n))
     {
       Leaf *l = LEAF_RAW (n);
-      return cb (LEAF_KEY (l), l->value, user_data);
+      return cb (LEAF_KEY (l), l->key_len, l->value, user_data);
     }
 
   switch (n->type)

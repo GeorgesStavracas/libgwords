@@ -115,6 +115,7 @@ radix_tree_many_entries (void)
 
 static gboolean
 iter_cb (const gchar *key,
+         gsize        key_length,
          gpointer     value,
          gpointer     user_data)
 {
@@ -155,6 +156,7 @@ radix_tree_iteration (void)
 
 static gboolean
 utf8_iter_cb (const gchar *key,
+              gsize        key_length,
               gpointer     value,
               gpointer     user_data)
 {
