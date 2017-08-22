@@ -192,6 +192,67 @@ radix_tree_utf8 (void)
 
 /**************************************************************************************************/
 
+static void
+radix_tree_get_keys (void)
+{
+  WordsRadixTree *tree;
+  GStrv keys;
+  gint i;
+
+  const gchar* entries[] = {
+    "Ħểłłỡ שׂờŕłđ",
+    "子犬",
+    "中文",
+    "Tiếng Việt, còn gọi",
+    "В'єтнамська мова"
+  };
+
+  tree = words_radix_tree_new ();
+
+  for (i = 0; i < G_N_ELEMENTS (entries); i++)
+    words_radix_tree_insert (tree, entries[i], -1, GINT_TO_POINTER (i));
+
+  keys = words_radix_tree_get_keys (tree);
+
+  g_assert_nonnull (keys);
+  g_assert_cmpuint (g_strv_length (keys), ==, G_N_ELEMENTS (entries));
+
+  g_clear_pointer (&keys, g_strfreev);
+  g_clear_object (&tree);
+}
+
+/**************************************************************************************************/
+
+static void
+radix_tree_get_values (void)
+{
+  g_autoptr (GPtrArray) values;
+  WordsRadixTree *tree;
+  gint i;
+
+  const gchar* entries[] = {
+    "Ħểłłỡ שׂờŕłđ",
+    "子犬",
+    "中文",
+    "Tiếng Việt, còn gọi",
+    "В'єтнамська мова"
+  };
+
+  tree = words_radix_tree_new ();
+
+  for (i = 0; i < G_N_ELEMENTS (entries); i++)
+    words_radix_tree_insert (tree, entries[i], -1, GINT_TO_POINTER (i));
+
+  values = words_radix_tree_get_values (tree);
+
+  g_assert_nonnull (values);
+  g_assert_cmpuint (values->len, ==, G_N_ELEMENTS (entries));
+
+  g_clear_object (&tree);
+}
+
+/**************************************************************************************************/
+
 gint
 main (gint   argc,
       gchar *argv[])
@@ -203,6 +264,8 @@ main (gint   argc,
   g_test_add_func ("/radix-tree/many_entries", radix_tree_many_entries);
   g_test_add_func ("/radix-tree/iteration", radix_tree_iteration);
   g_test_add_func ("/radix-tree/utf8", radix_tree_utf8);
+  g_test_add_func ("/radix-tree/get_keys", radix_tree_get_keys);
+  g_test_add_func ("/radix-tree/get_values", radix_tree_get_values);
 
   return g_test_run ();
 }
