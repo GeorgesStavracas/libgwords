@@ -16,7 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "test-config.h"
 #include "words.h"
+
+/*****************************************************************************/
 
 static void
 dictionary_init (void)
@@ -27,6 +30,8 @@ dictionary_init (void)
 
   g_clear_object (&dict);
 }
+
+/*****************************************************************************/
 
 static void
 dictionary_insert (void)
@@ -47,6 +52,8 @@ dictionary_insert (void)
 
   g_clear_object (&dict);
 }
+
+/*****************************************************************************/
 
 static void
 dictionary_remove (void)
@@ -77,8 +84,10 @@ dictionary_remove (void)
   g_clear_object (&dict);
 }
 
+/*****************************************************************************/
+
 static void
-dictionary_load_file (void)
+dictionary_load_file_ok (void)
 {
   WordsDictionary *dict;
   GError *error;
@@ -88,15 +97,40 @@ dictionary_load_file (void)
   error = NULL;
 
   success = words_dictionary_load_from_file_sync (dict,
-                                                  "english-words.txt",
+                                                  TESTDIR"/english-words.txt",
                                                   NULL,
                                                   NULL,
                                                   &error);
 
-  g_assert ((success && !error) || (!success && error));
+  g_assert (success && !error);
 
   g_clear_object (&dict);
 }
+
+/*****************************************************************************/
+
+static void
+dictionary_load_file_error (void)
+{
+  WordsDictionary *dict;
+  GError *error;
+  gboolean success;
+
+  dict = words_dictionary_new ();
+  error = NULL;
+
+  success = words_dictionary_load_from_file_sync (dict,
+                                                  "i_shouldnt_exist",
+                                                  NULL,
+                                                  NULL,
+                                                  &error);
+
+  g_assert (!success && error);
+
+  g_clear_object (&dict);
+}
+
+/*****************************************************************************/
 
 static void
 file_loaded_cb (GObject      *source_object,
@@ -111,7 +145,7 @@ file_loaded_cb (GObject      *source_object,
   error = NULL;
   success = words_dictionary_load_from_file_finish (res, &error);
 
-  g_assert ((success && !error) || (!success && error));
+  g_assert (success && !error);
 
   g_main_loop_quit (user_data);
 
@@ -119,7 +153,7 @@ file_loaded_cb (GObject      *source_object,
 }
 
 static void
-dictionary_load_file_async (void)
+dictionary_load_file_ok_async (void)
 {
   WordsDictionary *dict;
   GMainLoop *mainloop;
@@ -128,7 +162,7 @@ dictionary_load_file_async (void)
   mainloop = g_main_loop_new (NULL, FALSE);
 
   words_dictionary_load_from_file (dict,
-                                   "english-words.txt",
+                                   TESTDIR"/english-words.txt",
                                    NULL,
                                    file_loaded_cb,
                                    NULL,
@@ -136,6 +170,48 @@ dictionary_load_file_async (void)
 
   g_main_loop_run (mainloop);
 }
+
+/*****************************************************************************/
+
+static void
+file_loaded_error_cb (GObject      *source_object,
+                      GAsyncResult *res,
+                      gpointer      user_data)
+{
+  WordsDictionary *dict;
+  GError *error;
+  gboolean success;
+
+  dict = WORDS_DICTIONARY (source_object);
+  error = NULL;
+  success = words_dictionary_load_from_file_finish (res, &error);
+
+  g_assert (!success && error);
+
+  g_main_loop_quit (user_data);
+
+  g_clear_object (&dict);
+}
+
+static void
+dictionary_load_file_error_async (void)
+{
+  WordsDictionary *dict;
+  GMainLoop *mainloop;
+
+  dict = words_dictionary_new ();
+  mainloop = g_main_loop_new (NULL, FALSE);
+
+  words_dictionary_load_from_file (dict,
+                                   "i_shouldnt_exist",
+                                   NULL,
+                                   file_loaded_error_cb,
+                                   NULL,
+                                   mainloop);
+
+  g_main_loop_run (mainloop);
+}
+
 
 gint
 main (gint   argc,
@@ -146,8 +222,10 @@ main (gint   argc,
   g_test_add_func ("/dictionary/init", dictionary_init);
   g_test_add_func ("/dictionary/insert", dictionary_insert);
   g_test_add_func ("/dictionary/remove", dictionary_remove);
-  g_test_add_func ("/dictionary/load_file", dictionary_load_file);
-  g_test_add_func ("/dictionary/load_file_async", dictionary_load_file_async);
+  g_test_add_func ("/dictionary/load_file_ok", dictionary_load_file_ok);
+  g_test_add_func ("/dictionary/load_file_error", dictionary_load_file_error);
+  g_test_add_func ("/dictionary/load_file_ok_async", dictionary_load_file_ok_async);
+  g_test_add_func ("/dictionary/load_file_error_async", dictionary_load_file_error_async);
 
   return g_test_run ();
 }
