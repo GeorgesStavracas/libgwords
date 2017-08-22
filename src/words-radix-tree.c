@@ -149,7 +149,7 @@ get_keys_cb (const gchar *key,
 
   g_ptr_array_add (results, g_strdup (key));
 
-  return WORDS_RADIX_TREE_ITER_STOP;
+  return WORDS_RADIX_TREE_ITER_CONTINUE;
 }
 
 static inline gboolean
@@ -161,7 +161,7 @@ get_values_cb (const gchar *key,
 
   g_ptr_array_add (results, value);
 
-  return WORDS_RADIX_TREE_ITER_STOP;
+  return WORDS_RADIX_TREE_ITER_CONTINUE;
 }
 
 
