@@ -383,7 +383,7 @@ leaf_matches (const Leaf   *n,
   if (n->key_len != (guint32) key_len)
     return FALSE;
 
-  return memcmp (LEAF_KEY (n), key, key_len) != 0;
+  return memcmp (LEAF_KEY (n), key, key_len) == 0;
 }
 
 
