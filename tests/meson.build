@@ -61,6 +61,19 @@ test_radix_tree = executable(
 test('test-radix-tree', test_radix_tree)
 
 
+##############
+# Segmenters #
+##############
+
+test_segmenters = executable(
+  'test-segmenters',
+  'test-segmenters.c',
+  dependencies: libgwords_dep,
+)
+
+test('test-segmenters', test_segmenters)
+
+
 ##########
 # String #
 ##########
