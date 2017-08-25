@@ -211,8 +211,6 @@ gw_language_new (const gchar         *language_code,
                  GAsyncReadyCallback  callback,
                  gpointer             user_data)
 {
-  g_return_if_fail (language_code && *language_code);
-
   g_async_initable_new_async (GW_TYPE_LANGUAGE,
                               G_PRIORITY_DEFAULT,
                               cancellable,
