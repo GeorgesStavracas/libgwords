@@ -19,6 +19,8 @@
 #ifndef GW_SEGMENTER_H
 #define GW_SEGMENTER_H
 
+#include "gw-types.h"
+
 #include <glib-object.h>
 #include <gio/gio.h>
 
@@ -32,10 +34,10 @@ struct _GwSegmenterInterface
 {
   GTypeInterface parent;
 
-  const gchar*       (*get_text)                                 (GwSegmenter        *self);
+  GwString*          (*get_text)                                 (GwSegmenter        *self);
 
   void               (*set_text)                                 (GwSegmenter        *self,
-                                                                  const gchar        *text);
+                                                                  GwString           *text);
 
   gboolean           (*segment)                                  (GwSegmenter        *self,
                                                                   GCancellable       *cancellable,
@@ -44,10 +46,10 @@ struct _GwSegmenterInterface
   GStrv              (*get_words)                                (GwSegmenter        *self);
 };
 
-const gchar*         gw_segmenter_get_text                       (GwSegmenter        *self);
+GwString*            gw_segmenter_get_text                       (GwSegmenter        *self);
 
 void                 gw_segmenter_set_text                       (GwSegmenter        *self,
-                                                                  const gchar        *text);
+                                                                  GwString           *text);
 
 void                 gw_segmenter_segment                        (GwSegmenter        *self,
                                                                   GAsyncReadyCallback callback,

@@ -51,11 +51,11 @@ gw_segmenter_default_init (GwSegmenterInterface *iface)
  *
  * Retrieves the current text being segmented by @self.
  *
- * Returns: (transfer none)(nullable): the text set with gw_segmenter_set_text()
+ * Returns: (transfer none)(nullable): a #GwString
  *
  * Since: 0.1.0
  */
-const gchar*
+GwString*
 gw_segmenter_get_text (GwSegmenter *self)
 {
   g_return_val_if_fail (GW_IS_SEGMENTER (self), NULL);
@@ -67,7 +67,7 @@ gw_segmenter_get_text (GwSegmenter *self)
 /**
  * gw_segmenter_set_text:
  * @self: a #GwSegmenter
- * @text: (nullable): a text to segment
+ * @text: (nullable): a #GwString
  *
  * Sets the text to be segmented by @self to @text.
  *
@@ -75,7 +75,7 @@ gw_segmenter_get_text (GwSegmenter *self)
  */
 void
 gw_segmenter_set_text (GwSegmenter *self,
-                       const gchar *text)
+                       GwString    *text)
 {
   g_return_if_fail (GW_IS_SEGMENTER (self));
   g_return_if_fail (GW_SEGMENTER_GET_IFACE (self)->set_text);
