@@ -140,11 +140,17 @@ gw_language_set_property (GObject      *object,
           g_autofree gchar *lang = NULL;
 
           if (!gw_get_system_language (&lang, &region))
-            break;
+            {
+              self->init_error = g_error_new (GW_LANGUAGE_ERROR,
+                                              GW_LANGUAGE_ERROR_INVALID,
+                                              "Couldn't fetch system language");
+              break;
+            }
 
           self->code = g_strdup_printf ("%s_%s", lang, region);
         }
 
+      self->valid = TRUE;
       break;
 
     default:
@@ -167,6 +173,8 @@ gw_language_class_init (GwLanguageClass *klass)
                                                "Code of the language",
                                                NULL,
                                                G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS);
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
