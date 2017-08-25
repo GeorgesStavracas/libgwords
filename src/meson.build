@@ -9,6 +9,7 @@ libgwords_headers = [
   'gwords.h',
   'gw-dictionary.h',
   'gw-group.h',
+  'gw-init.h',
   'gw-language.h',
   'gw-radix-tree.h',
   'gw-segmenter.h',
@@ -18,6 +19,7 @@ libgwords_headers = [
 libgwords_sources = files(
   'gw-dictionary.c',
   'gw-group.c',
+  'gw-init.c',
   'gw-language.c',
   'gw-radix-tree.c',
   'gw-segmenter.c',

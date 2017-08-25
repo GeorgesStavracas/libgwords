@@ -1,4 +1,4 @@
-/* test-language.c
+/* gw-init.c
  *
  * Copyright (C) 2017 Georges Basile Stavracas Neto <georges.stavracas@gmail.com>
  *
@@ -16,38 +16,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "gwords.h"
+#include "gw-init.h"
+#include "gw-segmenter.h"
 
-/**************************************************************************************************/
+#include <gio/gio.h>
 
-static void
-get_system_language (void)
+/**
+ * gw_init:
+ *
+ * Main initializer of libgwords. Must be called before any other
+ * call to libgwords API.
+ *
+ * Since: 0.1.0
+ */
+void
+gw_init (void)
 {
-  gboolean result;
-  gchar *language, *region;
+  GIOExtensionPoint *extension_point;
 
-  result = gw_get_system_language (&language, &region);
-
-  g_assert (result);
-
-  g_message ("language: %s", language);
-  g_message ("region: %s", region);
-
-  g_clear_pointer (&language, g_free);
-}
-
-
-/**************************************************************************************************/
-
-gint
-main (gint   argc,
-      gchar *argv[])
-{
-  g_test_init (&argc, &argv, NULL);
-
-  gw_init ();
-
-  g_test_add_func ("/language/get_system_language", get_system_language);
-
-  return g_test_run ();
+  /* Extension point for GwSegmenter */
+  extension_point = g_io_extension_point_register (GW_EXTENSION_POINT_SEGMENTER);
+  g_io_extension_point_set_required_type (extension_point, GW_TYPE_SEGMENTER);
 }

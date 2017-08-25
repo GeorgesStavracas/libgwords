@@ -26,6 +26,7 @@ G_BEGIN_DECLS
 #define GWORDS_INSIDE
 # include "gw-dictionary.h"
 # include "gw-group.h"
+# include "gw-init.h"
 # include "gw-radix-tree.h"
 # include "gw-utils.h"
 # include "gw-version.h"

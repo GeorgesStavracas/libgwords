@@ -1,4 +1,4 @@
-/* test-language.c
+/* gw-init.h
  *
  * Copyright (C) 2017 Georges Basile Stavracas Neto <georges.stavracas@gmail.com>
  *
@@ -16,38 +16,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "gwords.h"
+#ifndef GW_INIT_H
+#define GW_INIT_H
 
-/**************************************************************************************************/
+#include <glib.h>
 
-static void
-get_system_language (void)
-{
-  gboolean result;
-  gchar *language, *region;
+#define GW_EXTENSION_POINT_SEGMENTER         "gw-segmenter-ep"
 
-  result = gw_get_system_language (&language, &region);
+G_BEGIN_DECLS
 
-  g_assert (result);
+void                 gw_init                                     (void);
 
-  g_message ("language: %s", language);
-  g_message ("region: %s", region);
+G_END_DECLS
 
-  g_clear_pointer (&language, g_free);
-}
-
-
-/**************************************************************************************************/
-
-gint
-main (gint   argc,
-      gchar *argv[])
-{
-  g_test_init (&argc, &argv, NULL);
-
-  gw_init ();
-
-  g_test_add_func ("/language/get_system_language", get_system_language);
-
-  return g_test_run ();
-}
+#endif /* GW_INIT_H */
