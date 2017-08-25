@@ -19,6 +19,7 @@
 #include "gw-init.h"
 #include "gw-language.h"
 #include "gw-radix-tree.h"
+#include "gw-segmenter.h"
 #include "gw-utils.h"
 
 struct _GwLanguage
@@ -43,6 +44,7 @@ enum
 {
   PROP_0,
   PROP_CODE,
+  PROP_SEGMENTER,
   N_PROPS
 };
 
@@ -90,6 +92,8 @@ gw_language_set_language_code_internal (GwLanguage  *self,
     segmenter_extension = g_io_extension_point_get_extension_by_name (extension_point, "fallback");
 
   self->segmenter = g_object_new (g_io_extension_get_type (segmenter_extension), NULL);
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SEGMENTER]);
 }
 
 /*
@@ -132,6 +136,7 @@ gw_language_finalize (GObject *object)
   GwLanguage *self = (GwLanguage *)object;
 
   g_clear_pointer (&self->code, g_free);
+  g_clear_object (&self->segmenter);
 
   G_OBJECT_CLASS (gw_language_parent_class)->finalize (object);
 }
@@ -199,6 +204,12 @@ gw_language_class_init (GwLanguageClass *klass)
                                                "Code of the language",
                                                NULL,
                                                G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS);
+
+  properties[PROP_SEGMENTER] = g_param_spec_object ("segmenter",
+                                                    "Word segmenter",
+                                                    "Word segmenter of the language",
+                                                    GW_TYPE_SEGMENTER,
+                                                    G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
