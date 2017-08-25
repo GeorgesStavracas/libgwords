@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "../../gwords.h"
+
 #include "gw-segmenter-pt-br.h"
 
 struct _GwSegmenterPtBr
