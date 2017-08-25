@@ -14,6 +14,7 @@ libgwords_headers = [
   'gw-radix-tree.h',
   'gw-segmenter.h',
   'gw-string.h',
+  'gw-types.h',
   'gw-utils.h',
 ]
 
