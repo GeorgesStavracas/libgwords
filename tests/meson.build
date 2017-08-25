@@ -59,3 +59,16 @@ test_radix_tree = executable(
 )
 
 test('test-radix-tree', test_radix_tree)
+
+
+##########
+# String #
+##########
+
+test_string = executable(
+  'test-string',
+  'test-string.c',
+  dependencies: libgwords_dep,
+)
+
+test('test-string', test_string)
