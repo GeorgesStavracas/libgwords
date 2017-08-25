@@ -1,4 +1,4 @@
-/* words-language.c
+/* gw-language.c
  *
  * Copyright (C) 2017 Georges Basile Stavracas Neto <georges.stavracas@gmail.com>
  *
@@ -17,10 +17,10 @@
  */
 
 
-#include "words-language.h"
-#include "words-radix-tree.h"
+#include "gw-language.h"
+#include "gw-radix-tree.h"
 
-struct _WordsLanguage
+struct _GwLanguage
 {
   GObject             parent;
 
@@ -30,10 +30,10 @@ struct _WordsLanguage
   gboolean            valid : 1;
 };
 
-static void          words_language_initable_iface_init          (GInitableIface     *iface);
+static void          gw_language_initable_iface_init          (GInitableIface     *iface);
 
-G_DEFINE_TYPE_WITH_CODE (WordsLanguage, words_language, G_TYPE_OBJECT,
-                         G_IMPLEMENT_INTERFACE (G_TYPE_INITABLE, words_language_initable_iface_init)
+G_DEFINE_TYPE_WITH_CODE (GwLanguage, gw_language, G_TYPE_OBJECT,
+                         G_IMPLEMENT_INTERFACE (G_TYPE_INITABLE, gw_language_initable_iface_init)
                          G_IMPLEMENT_INTERFACE (G_TYPE_ASYNC_INITABLE, NULL))
 
 enum
@@ -53,11 +53,11 @@ static GParamSpec *properties [N_PROPS] = { NULL, };
 G_LOCK_DEFINE_STATIC (init_lock);
 
 static gboolean
-words_language_initable_init (GInitable     *initable,
+gw_language_initable_init (GInitable     *initable,
                               GCancellable  *cancellable,
                               GError       **error)
 {
-  WordsLanguage *self = WORDS_LANGUAGE (initable);
+  GwLanguage *self = GW_LANGUAGE (initable);
 
   G_LOCK (init_lock);
 
@@ -70,9 +70,9 @@ words_language_initable_init (GInitable     *initable,
 }
 
 static void
-words_language_initable_iface_init (GInitableIface *iface)
+gw_language_initable_iface_init (GInitableIface *iface)
 {
-  iface->init = words_language_initable_init;
+  iface->init = gw_language_initable_init;
 }
 
 
@@ -81,32 +81,32 @@ words_language_initable_iface_init (GInitableIface *iface)
  */
 
 static void
-words_language_finalize (GObject *object)
+gw_language_finalize (GObject *object)
 {
-  WordsLanguage *self = (WordsLanguage *)object;
+  GwLanguage *self = (GwLanguage *)object;
 
   g_clear_pointer (&self->code, g_free);
 
-  G_OBJECT_CLASS (words_language_parent_class)->finalize (object);
+  G_OBJECT_CLASS (gw_language_parent_class)->finalize (object);
 }
 
 static void
-words_language_constructed (GObject *object)
+gw_language_constructed (GObject *object)
 {
-  WordsLanguage *self = WORDS_LANGUAGE (object);
+  GwLanguage *self = GW_LANGUAGE (object);
 
   (void)self;
 
-  G_OBJECT_CLASS (words_language_parent_class)->constructed (object);
+  G_OBJECT_CLASS (gw_language_parent_class)->constructed (object);
 }
 
 static void
-words_language_get_property (GObject    *object,
-                             guint       prop_id,
-                             GValue     *value,
-                             GParamSpec *pspec)
+gw_language_get_property (GObject    *object,
+                          guint       prop_id,
+                          GValue     *value,
+                          GParamSpec *pspec)
 {
-  WordsLanguage *self = WORDS_LANGUAGE (object);
+  GwLanguage *self = GW_LANGUAGE (object);
 
   switch (prop_id)
     {
@@ -120,12 +120,12 @@ words_language_get_property (GObject    *object,
 }
 
 static void
-words_language_set_property (GObject      *object,
-                             guint         prop_id,
-                             const GValue *value,
-                             GParamSpec   *pspec)
+gw_language_set_property (GObject      *object,
+                          guint         prop_id,
+                          const GValue *value,
+                          GParamSpec   *pspec)
 {
-  WordsLanguage *self = WORDS_LANGUAGE (object);
+  GwLanguage *self = GW_LANGUAGE (object);
 
   switch (prop_id)
     {
@@ -139,14 +139,14 @@ words_language_set_property (GObject      *object,
 }
 
 static void
-words_language_class_init (WordsLanguageClass *klass)
+gw_language_class_init (GwLanguageClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  object_class->finalize = words_language_finalize;
-  object_class->constructed = words_language_constructed;
-  object_class->get_property = words_language_get_property;
-  object_class->set_property = words_language_set_property;
+  object_class->finalize = gw_language_finalize;
+  object_class->constructed = gw_language_constructed;
+  object_class->get_property = gw_language_get_property;
+  object_class->set_property = gw_language_set_property;
 
   properties[PROP_CODE] = g_param_spec_string ("code",
                                                "Code of the language",
@@ -156,7 +156,7 @@ words_language_class_init (WordsLanguageClass *klass)
 }
 
 static void
-words_language_init (WordsLanguage *self)
+gw_language_init (GwLanguage *self)
 {
 }
 
@@ -166,32 +166,32 @@ words_language_init (WordsLanguage *self)
  * Error quark for event creating.
  */
 GQuark
-words_language_error_quark (void)
+gw_language_error_quark (void)
 {
   return g_quark_from_static_string ("Invalid language");
 }
 
 /**
- * words_language_new:
+ * gw_language_new:
  * @language: the language code
  * @cancellable: (nullable): optional #GCancellable object
  * @callback: (scope async): a #GAsyncReadyCallback to call when the initialization is done
  * @user_data: (closure): data to pass to the callback function
  *
- * Asynchronously creates a new #WordsLanguage. When it finishes, @callback will
+ * Asynchronously creates a new #GwLanguage. When it finishes, @callback will
  * be called.
  *
  * Since: 0.1.0
  */
 void
-words_language_new (const gchar         *language_code,
-                    GCancellable        *cancellable,
-                    GAsyncReadyCallback  callback,
-                    gpointer             user_data)
+gw_language_new (const gchar         *language_code,
+                 GCancellable        *cancellable,
+                 GAsyncReadyCallback  callback,
+                 gpointer             user_data)
 {
   g_return_if_fail (language_code && *language_code);
 
-  g_async_initable_new_async (WORDS_TYPE_LANGUAGE,
+  g_async_initable_new_async (GW_TYPE_LANGUAGE,
                               G_PRIORITY_DEFAULT,
                               cancellable,
                               callback,
@@ -201,20 +201,20 @@ words_language_new (const gchar         *language_code,
 }
 
 /**
- * words_language_new_finish:
+ * gw_language_new_finish:
  * @result: a #GAsyncResult
  * @error: (nullable): return location for a #GError
  *
- * Finishes an asynchronous initialization started in words_language_new(). If
+ * Finishes an asynchronous initialization started in gw_language_new(). If
  * an error occurs, the functions sets @error and returns %NULL.
  *
- * Returns: (transfer full) (nullable): a #WordsLanguage
+ * Returns: (transfer full) (nullable): a #GwLanguage
  *
  * Since: 0.1.0
  */
-WordsLanguage*
-words_language_new_finish (GAsyncResult  *result,
-                           GError       **error)
+GwLanguage*
+gw_language_new_finish (GAsyncResult  *result,
+                        GError       **error)
 {
   GObject *language, *source;
 
@@ -223,12 +223,12 @@ words_language_new_finish (GAsyncResult  *result,
 
   g_clear_object (&source);
 
-  return language ? WORDS_LANGUAGE (language) : NULL;
+  return language ? GW_LANGUAGE (language) : NULL;
 }
 
 
 /**
- * words_language_new_sync:
+ * gw_language_new_sync:
  * @language: the language string.
  * @cancellable: (nullable): a #GCancellable to cancel the operation
  * @error: (nullable): return value for a #GError
@@ -238,14 +238,14 @@ words_language_new_finish (GAsyncResult  *result,
  *
  * @language accepts the same format of LC_LANG.
  *
- * Returns: (transfer full)(nullable): a #WordsLanguage
+ * Returns: (transfer full)(nullable): a #GwLanguage
  */
-WordsLanguage*
-words_language_new_sync (const gchar   *language_code,
-                         GCancellable  *cancellable,
-                         GError       **error)
+GwLanguage*
+gw_language_new_sync (const gchar   *language_code,
+                      GCancellable  *cancellable,
+                      GError       **error)
 {
-  return g_initable_new (WORDS_TYPE_LANGUAGE,
+  return g_initable_new (GW_TYPE_LANGUAGE,
                          cancellable,
                          error,
                          "code", language_code,

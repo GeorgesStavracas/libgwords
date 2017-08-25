@@ -1,25 +1,25 @@
-words_headers_dir = join_paths(words_prefix, get_option('includedir'), 'words')
+libgwords_headers_dir = join_paths(gw_prefix, get_option('includedir'), 'words')
 
 deps = [
   glib_dep,
   gio_dep,
 ]
 
-word_headers = [
-  'words.h',
-  'words-dictionary.h',
-  'words-group.h',
-  'words-language.h',
-  'words-radix-tree.h',
-  'words-segmenter.h',
+libgwords_headers = [
+  'gwords.h',
+  'gw-dictionary.h',
+  'gw-group.h',
+  'gw-language.h',
+  'gw-radix-tree.h',
+  'gw-segmenter.h',
 ]
 
-word_sources = files(
-  'words-dictionary.c',
-  'words-group.c',
-  'words-language.c',
-  'words-radix-tree.c',
-  'words-segmenter.c',
+libgwords_sources = files(
+  'gw-dictionary.c',
+  'gw-group.c',
+  'gw-language.c',
+  'gw-radix-tree.c',
+  'gw-segmenter.c',
 )
 
 
@@ -28,42 +28,42 @@ word_sources = files(
 ###########
 
 version_data = configuration_data()
-version_data.set('VERSION', words_version)
-version_data.set('MAJOR_VERSION', words_major_version)
-version_data.set('MINOR_VERSION', words_minor_version)
-version_data.set('MICRO_VERSION', words_micro_version)
+version_data.set('VERSION', gw_version)
+version_data.set('MAJOR_VERSION', gw_major_version)
+version_data.set('MINOR_VERSION', gw_minor_version)
+version_data.set('MICRO_VERSION', gw_micro_version)
 
 configure_file(
-          input: 'words-version.h.in',
-         output: 'words-version.h',
-    install_dir: join_paths(get_option('prefix'), get_option('includedir'), 'words'),
+          input: 'gw-version.h.in',
+         output: 'gw-version.h',
+    install_dir: join_paths(get_option('prefix'), get_option('includedir'), 'gwords'),
   configuration: version_data
 )
 
 
-############
-# libwords #
-############
+#############
+# libgwords #
+#############
 
-libwords = shared_library(
-              'words-' + words_major_version,
-              sources: word_sources,
-            soversion: words_major_version,
-              version: words_major_version,
-          install_dir: words_libdir,
-        install_rpath: words_libdir_abs,
+libgwords = shared_library(
+              'words-' + gw_major_version,
+              sources: libgwords_sources,
+            soversion: gw_major_version,
+              version: gw_major_version,
+          install_dir: gw_libdir,
+        install_rpath: gw_libdir_abs,
   include_directories: include_directories('.'),
          dependencies: deps,
               install: true
 )
 
-libwords_dep = declare_dependency(
-            link_with: libwords,
+libgwords_dep = declare_dependency(
+            link_with: libgwords,
   include_directories: include_directories('.'),
          dependencies: [ glib_dep, gio_dep ],
 )
 
-install_headers(word_headers, install_dir: words_headers_dir)
+install_headers(libgwords_headers, install_dir: libgwords_headers_dir)
 
 
 ##############
@@ -73,11 +73,11 @@ install_headers(word_headers, install_dir: words_headers_dir)
 pkgg = import('pkgconfig')
 
 pkgg.generate(
-         name: 'libwords',
+         name: 'libgwords',
   description: 'Natural Language Text Management for GNOME',
-     filebase: 'words-' + words_major_version,
-      version: words_version,
-    libraries: libwords,
+     filebase: 'words-' + gw_major_version,
+      version: gw_version,
+    libraries: libgwords,
      requires: ['glib-2.0', 'gobject-2.0', 'gio-2.0'],
-  install_dir: join_paths(words_libdir, 'pkgconfig')
+  install_dir: join_paths(gw_libdir, 'pkgconfig')
 )

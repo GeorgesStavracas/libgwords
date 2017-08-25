@@ -29,7 +29,7 @@ configure_file(
 test_dictionary = executable(
   'test-dictionary',
   'test-dictionary.c',
-  dependencies: libwords_dep,
+  dependencies: libgwords_dep,
 )
 
 test('test-dictionary', test_dictionary)
@@ -42,7 +42,7 @@ test('test-dictionary', test_dictionary)
 test_radix_tree = executable(
   'test-radix-tree',
   'test-radix-tree.c',
-  dependencies: libwords_dep,
+  dependencies: libgwords_dep,
 )
 
 test('test-radix-tree', test_radix_tree)

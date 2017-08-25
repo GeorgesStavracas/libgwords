@@ -1,4 +1,4 @@
-/* words-segmenter.h
+/* gw-segmenter.h
  *
  * Copyright (C) 2016 Georges Basile Stavracas Neto <georges.stavracas@gmail.com>
  *
@@ -16,53 +16,53 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WORDS_SEGMENTER_H
-#define WORDS_SEGMENTER_H
+#ifndef GW_SEGMENTER_H
+#define GW_SEGMENTER_H
 
 #include <glib-object.h>
 #include <gio/gio.h>
 
 G_BEGIN_DECLS
 
-#define WORDS_TYPE_SEGMENTER (words_segmenter_get_type ())
+#define GW_TYPE_SEGMENTER (gw_segmenter_get_type ())
 
-G_DECLARE_INTERFACE (WordsSegmenter, words_segmenter, WORDS, SEGMENTER, GObject)
+G_DECLARE_INTERFACE (GwSegmenter, gw_segmenter, GW, SEGMENTER, GObject)
 
-struct _WordsSegmenterInterface
+struct _GwSegmenterInterface
 {
   GTypeInterface parent;
 
-  const gchar*       (*get_text)                                 (WordsSegmenter     *self);
+  const gchar*       (*get_text)                                 (GwSegmenter        *self);
 
-  void               (*set_text)                                 (WordsSegmenter     *self,
+  void               (*set_text)                                 (GwSegmenter        *self,
                                                                   const gchar        *text);
 
-  gboolean           (*segment)                                  (WordsSegmenter     *self,
+  gboolean           (*segment)                                  (GwSegmenter        *self,
                                                                   GCancellable       *cancellable,
                                                                   GError            **error);
 
-  GStrv              (*get_words)                                (WordsSegmenter     *self);
+  GStrv              (*get_words)                                (GwSegmenter        *self);
 };
 
-const gchar*         words_segmenter_get_text                    (WordsSegmenter     *self);
+const gchar*         gw_segmenter_get_text                       (GwSegmenter        *self);
 
-void                 words_segmenter_set_text                    (WordsSegmenter     *self,
+void                 gw_segmenter_set_text                       (GwSegmenter        *self,
                                                                   const gchar        *text);
 
-void                 words_segmenter_segment                     (WordsSegmenter     *self,
+void                 gw_segmenter_segment                        (GwSegmenter        *self,
                                                                   GAsyncReadyCallback callback,
                                                                   GCancellable       *cancellable,
                                                                   gpointer            user_data);
 
-gboolean             words_segmenter_segment_finish              (GAsyncResult       *result,
+gboolean             gw_segmenter_segment_finish                 (GAsyncResult       *result,
                                                                   GError            **error);
 
-gboolean             words_segmenter_segment_sync                (WordsSegmenter     *self,
+gboolean             gw_segmenter_segment_sync                   (GwSegmenter        *self,
                                                                   GCancellable       *cancellable,
                                                                   GError            **error);
 
-GStrv                words_segmenter_get_words                   (WordsSegmenter     *self);
+GStrv                gw_segmenter_get_words                      (GwSegmenter        *self);
 
 G_END_DECLS
 
-#endif /* WORDS_SEGMENTER_H */
+#endif /* GW_SEGMENTER_H */

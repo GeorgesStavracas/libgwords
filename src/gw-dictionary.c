@@ -1,4 +1,4 @@
-/* words-dictionary.c
+/* gw-dictionary.c
  *
  * Copyright (C) 2016 Georges Basile Stavracas Neto <georges.stavracas@gmail.com>
  *
@@ -16,25 +16,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "words-dictionary.h"
-#include "words-radix-tree.h"
+#include "gw-dictionary.h"
+#include "gw-radix-tree.h"
 
 /**
- * SECTION:words-dictionary
+ * SECTION:gw-dictionary
  * @short_title:a dictionary of words
- * @title:WordsDictionary
+ * @title:GwDictionary
  * @stability:Unstable
  *
- * The #WordsDictionary class is a wrapper around a #WordsRadixTree specialized in
+ * The #GwDictionary class is a wrapper around a #GwRadixTree specialized in
  * dealing with words.
  */
 
 typedef struct
 {
-  WordsRadixTree     *tree;
-} WordsDictionaryPrivate;
+  GwRadixTree        *tree;
+} GwDictionaryPrivate;
 
-G_DEFINE_TYPE_WITH_PRIVATE (WordsDictionary, words_dictionary, G_TYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE (GwDictionary, gw_dictionary, G_TYPE_OBJECT)
 
 enum
 {
@@ -70,7 +70,7 @@ load_gfile_in_thread_cb (GTask        *task,
                          gpointer      task_data,
                          GCancellable *cancellable)
 {
-  WordsDictionary *self;
+  GwDictionary *self;
   TaskData *data;
   GError *error;
 
@@ -78,7 +78,7 @@ load_gfile_in_thread_cb (GTask        *task,
   data = task_data;
   error = NULL;
 
-  words_dictionary_load_from_gfile_sync (self,
+  gw_dictionary_load_from_gfile_sync (self,
                                          data->file,
                                          data->delimiter,
                                          cancellable,
@@ -94,30 +94,30 @@ load_gfile_in_thread_cb (GTask        *task,
 }
 
 static void
-tree_size_changed_cb (WordsDictionary *self)
+tree_size_changed_cb (GwDictionary *self)
 {
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SIZE]);
 }
 
 static void
-words_dictionary_finalize (GObject *object)
+gw_dictionary_finalize (GObject *object)
 {
-  WordsDictionary *self = (WordsDictionary *)object;
-  WordsDictionaryPrivate *priv = words_dictionary_get_instance_private (self);
+  GwDictionary *self = (GwDictionary *)object;
+  GwDictionaryPrivate *priv = gw_dictionary_get_instance_private (self);
 
   g_clear_object (&priv->tree);
 
-  G_OBJECT_CLASS (words_dictionary_parent_class)->finalize (object);
+  G_OBJECT_CLASS (gw_dictionary_parent_class)->finalize (object);
 }
 
 static void
-words_dictionary_get_property (GObject    *object,
-                               guint       prop_id,
-                               GValue     *value,
-                               GParamSpec *pspec)
+gw_dictionary_get_property (GObject    *object,
+                            guint       prop_id,
+                            GValue     *value,
+                            GParamSpec *pspec)
 {
-  WordsDictionary *self = WORDS_DICTIONARY (object);
-  WordsDictionaryPrivate *priv = words_dictionary_get_instance_private (self);
+  GwDictionary *self = GW_DICTIONARY (object);
+  GwDictionaryPrivate *priv = gw_dictionary_get_instance_private (self);
 
   switch (prop_id)
     {
@@ -126,7 +126,7 @@ words_dictionary_get_property (GObject    *object,
       break;
 
     case PROP_SIZE:
-      g_value_set_int (value, words_radix_tree_get_size (priv->tree));
+      g_value_set_int (value, gw_radix_tree_get_size (priv->tree));
       break;
 
     default:
@@ -135,38 +135,38 @@ words_dictionary_get_property (GObject    *object,
 }
 
 static void
-words_dictionary_set_property (GObject      *object,
-                               guint         prop_id,
-                               const GValue *value,
-                               GParamSpec   *pspec)
+gw_dictionary_set_property (GObject      *object,
+                            guint         prop_id,
+                            const GValue *value,
+                            GParamSpec   *pspec)
 {
   G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
 }
 
 static void
-words_dictionary_class_init (WordsDictionaryClass *klass)
+gw_dictionary_class_init (GwDictionaryClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  object_class->finalize = words_dictionary_finalize;
-  object_class->get_property = words_dictionary_get_property;
-  object_class->set_property = words_dictionary_set_property;
+  object_class->finalize = gw_dictionary_finalize;
+  object_class->get_property = gw_dictionary_get_property;
+  object_class->set_property = gw_dictionary_set_property;
 
   /**
-   * WordsDictionary:radix-tree:
+   * GwDictionary:radix-tree:
    *
-   * The internal #WordsRadixTree of this dictionary.
+   * The internal #GwRadixTree of this dictionary.
    *
    * Since: 0.1.0
    */
   properties[PROP_RADIX_TREE] = g_param_spec_object ("radix-tree",
                                                      "Radix tree",
                                                      "The internal radix tree of this dictionary",
-                                                     WORDS_TYPE_RADIX_TREE,
+                                                     GW_TYPE_RADIX_TREE,
                                                      G_PARAM_READABLE);
 
   /**
-   * WordsDictionary:size:
+   * GwDictionary:size:
    *
    * The number of elements this dictionary contains.
    *
@@ -184,11 +184,11 @@ words_dictionary_class_init (WordsDictionaryClass *klass)
 }
 
 static void
-words_dictionary_init (WordsDictionary *self)
+gw_dictionary_init (GwDictionary *self)
 {
-  WordsDictionaryPrivate *priv = words_dictionary_get_instance_private (self);
+  GwDictionaryPrivate *priv = gw_dictionary_get_instance_private (self);
 
-  priv->tree = words_radix_tree_new ();
+  priv->tree = gw_radix_tree_new ();
 
   g_signal_connect (priv->tree,
                     "notify::size",
@@ -197,23 +197,23 @@ words_dictionary_init (WordsDictionary *self)
 }
 
 /**
- * words_dictionary_new:
+ * gw_dictionary_new:
  *
- * Creates a new #WordsDictionary.
+ * Creates a new #GwDictionary.
  *
- * Returns:(transfer full): a #WordsDictionary.
+ * Returns:(transfer full): a #GwDictionary.
  *
  * Since: 0.1.0
  */
-WordsDictionary*
-words_dictionary_new (void)
+GwDictionary*
+gw_dictionary_new (void)
 {
-  return g_object_new (WORDS_TYPE_DICTIONARY, NULL);
+  return g_object_new (GW_TYPE_DICTIONARY, NULL);
 }
 
 /**
- * words_dictionary_contains:
- * @self: a #WordsDictionary
+ * gw_dictionary_contains:
+ * @self: a #GwDictionary
  * @word: the key to search for
  *
  * Checks if @self contains the word @word.
@@ -223,23 +223,23 @@ words_dictionary_new (void)
  * Since: 0.1.0
  */
 gboolean
-words_dictionary_contains (WordsDictionary *self,
-                           const gchar     *word,
-                           gsize            word_length)
+gw_dictionary_contains (GwDictionary *self,
+                        const gchar     *word,
+                        gsize            word_length)
 {
-  WordsDictionaryPrivate *priv;
+  GwDictionaryPrivate *priv;
 
-  g_return_val_if_fail (WORDS_IS_DICTIONARY (self), FALSE);
+  g_return_val_if_fail (GW_IS_DICTIONARY (self), FALSE);
   g_return_val_if_fail (word != NULL, FALSE);
 
-  priv = words_dictionary_get_instance_private (self);
+  priv = gw_dictionary_get_instance_private (self);
 
-  return words_radix_tree_contains (priv->tree, word, word_length);
+  return gw_radix_tree_contains (priv->tree, word, word_length);
 }
 
 /**
- * words_dictionary_insert:
- * @self: a #WordsDictionary
+ * gw_dictionary_insert:
+ * @self: a #GwDictionary
  * @word: a word to insert in @self
  * @word_length: the length of @key, or -1
  *
@@ -249,23 +249,23 @@ words_dictionary_contains (WordsDictionary *self,
  * Since: 0.1.0
  */
 void
-words_dictionary_insert (WordsDictionary *self,
-                         const gchar     *word,
-                         gsize            word_length)
+gw_dictionary_insert (GwDictionary *self,
+                      const gchar     *word,
+                      gsize            word_length)
 {
-  WordsDictionaryPrivate *priv;
+  GwDictionaryPrivate *priv;
 
-  g_return_if_fail (WORDS_IS_DICTIONARY (self));
+  g_return_if_fail (GW_IS_DICTIONARY (self));
   g_return_if_fail (word != NULL);
 
-  priv = words_dictionary_get_instance_private (self);
+  priv = gw_dictionary_get_instance_private (self);
 
-  words_radix_tree_insert (priv->tree, word, word_length, NULL);
+  gw_radix_tree_insert (priv->tree, word, word_length, NULL);
 }
 
 /**
- * words_dictionary_remove:
- * @self: a #WordsDictionary
+ * gw_dictionary_remove:
+ * @self: a #GwDictionary
  * @word: a word to remove from @self
  *
  * Removes @word from @self. If @word is not present, nothing
@@ -274,23 +274,23 @@ words_dictionary_insert (WordsDictionary *self,
  * Since: 0.1.0
  */
 void
-words_dictionary_remove (WordsDictionary *self,
-                         const gchar     *word,
-                         gsize            word_length)
+gw_dictionary_remove (GwDictionary *self,
+                      const gchar     *word,
+                      gsize            word_length)
 {
-  WordsDictionaryPrivate *priv;
+  GwDictionaryPrivate *priv;
 
-  g_return_if_fail (WORDS_IS_DICTIONARY (self));
+  g_return_if_fail (GW_IS_DICTIONARY (self));
   g_return_if_fail (word != NULL);
 
-  priv = words_dictionary_get_instance_private (self);
+  priv = gw_dictionary_get_instance_private (self);
 
-  words_radix_tree_remove (priv->tree, word, word_length);
+  gw_radix_tree_remove (priv->tree, word, word_length);
 }
 
 /**
- * words_dictionary_load_from_file:
- * @self: a #WordsDictionary
+ * gw_dictionary_load_from_file:
+ * @self: a #GwDictionary
  * @file_path: the path to the file
  * @delimiter: (nullable): the delimiter to split the file contents
  * @callback: (): callback to call when the operation is done
@@ -301,26 +301,26 @@ words_dictionary_remove (WordsDictionary *self,
  * the newline is used instead.
  *
  * This method has the same effect of creating a #GFile and loading
- * with words_dictionary_load_from_gfile().
+ * with gw_dictionary_load_from_gfile().
  *
  * Since: 0.1.0
  */
 void
-words_dictionary_load_from_file (WordsDictionary     *self,
-                                 const gchar         *file_path,
-                                 const gchar         *delimiter,
-                                 GAsyncReadyCallback  callback,
-                                 GCancellable        *cancellable,
-                                 gpointer             user_data)
+gw_dictionary_load_from_file (GwDictionary     *self,
+                              const gchar         *file_path,
+                              const gchar         *delimiter,
+                              GAsyncReadyCallback  callback,
+                              GCancellable        *cancellable,
+                              gpointer             user_data)
 {
   GFile *file;
 
-  g_return_if_fail (WORDS_IS_DICTIONARY (self));
+  g_return_if_fail (GW_IS_DICTIONARY (self));
   g_return_if_fail (file_path != NULL);
 
   file = g_file_new_for_path (file_path);
 
-  words_dictionary_load_from_gfile (self,
+  gw_dictionary_load_from_gfile (self,
                                     file,
                                     delimiter,
                                     callback,
@@ -331,19 +331,19 @@ words_dictionary_load_from_file (WordsDictionary     *self,
 }
 
 /**
- * words_dictionary_load_from_file_finish:
+ * gw_dictionary_load_from_file_finish:
  * @result: a #GAsyncResult
  * @error: (nullable): return location for a #GError
  *
- * Finished the operation started by words_dictionary_load_from_file().
+ * Finished the operation started by gw_dictionary_load_from_file().
  *
  * Returns: %TRUE if the load was successfull, %FALSE otherwise.
  *
  * Since: 0.1.0
  */
 gboolean
-words_dictionary_load_from_file_finish (GAsyncResult  *result,
-                                        GError       **error)
+gw_dictionary_load_from_file_finish (GAsyncResult  *result,
+                                     GError       **error)
 {
   g_return_val_if_fail (G_IS_TASK (result), FALSE);
   g_return_val_if_fail (!error || !*error, FALSE);
@@ -352,8 +352,8 @@ words_dictionary_load_from_file_finish (GAsyncResult  *result,
 }
 
 /**
- * words_dictionary_load_from_file_sync:
- * @self: a #WordsDictionary
+ * gw_dictionary_load_from_file_sync:
+ * @self: a #GwDictionary
  * @file_path: location of the file to load
  * @delimiter: (nullable): delimitir to split the file contents
  * @cancellable: (nullable): cancellable to cancel the operation
@@ -361,7 +361,7 @@ words_dictionary_load_from_file_finish (GAsyncResult  *result,
  *
  * Reads the contents of @file_path into @self.
  *
- * This method blocks the mainloop. See words_dictionary_load_from_file() for
+ * This method blocks the mainloop. See gw_dictionary_load_from_file() for
  * the asynchronous variant.
  *
  * Returns: %TRUE if the load was successfull, %FALSE otherwise.
@@ -369,22 +369,22 @@ words_dictionary_load_from_file_finish (GAsyncResult  *result,
  * Since: 0.1.0
  */
 gboolean
-words_dictionary_load_from_file_sync (WordsDictionary  *self,
-                                      const gchar      *file_path,
-                                      const gchar      *delimiter,
-                                      GCancellable     *cancellable,
-                                      GError          **error)
+gw_dictionary_load_from_file_sync (GwDictionary  *self,
+                                   const gchar      *file_path,
+                                   const gchar      *delimiter,
+                                   GCancellable     *cancellable,
+                                   GError          **error)
 {
   GFile *file;
   gboolean retval;
 
-  g_return_val_if_fail (WORDS_IS_DICTIONARY (self), FALSE);
+  g_return_val_if_fail (GW_IS_DICTIONARY (self), FALSE);
   g_return_val_if_fail (!error || !*error, FALSE);
   g_return_val_if_fail (file_path != NULL, FALSE);
 
   file = g_file_new_for_path (file_path);
 
-  retval = words_dictionary_load_from_gfile_sync (self,
+  retval = gw_dictionary_load_from_gfile_sync (self,
                                                   file,
                                                   delimiter,
                                                   cancellable,
@@ -396,8 +396,8 @@ words_dictionary_load_from_file_sync (WordsDictionary  *self,
 }
 
 /**
- * words_dictionary_load_from_file:
- * @self: a #WordsDictionary
+ * gw_dictionary_load_from_file:
+ * @self: a #GwDictionary
  * @file_path: the path to the file
  * @delimiter: (nullable): the delimiter to split the file contents
  * @callback: (): callback to call when the operation is done
@@ -408,22 +408,22 @@ words_dictionary_load_from_file_sync (WordsDictionary  *self,
  * the newline is used instead.
  *
  * This method has the same effect of creating a #GFile and loading
- * with words_dictionary_load_from_gfile().
+ * with gw_dictionary_load_from_gfile().
  *
  * Since: 0.1.0
  */
 void
-words_dictionary_load_from_resource (WordsDictionary     *self,
-                                     const gchar         *resource_path,
-                                     const gchar         *delimiter,
-                                     GAsyncReadyCallback  callback,
-                                     GCancellable        *cancellable,
-                                     gpointer             user_data)
+gw_dictionary_load_from_resource (GwDictionary     *self,
+                                  const gchar         *resource_path,
+                                  const gchar         *delimiter,
+                                  GAsyncReadyCallback  callback,
+                                  GCancellable        *cancellable,
+                                  gpointer             user_data)
 {
   GFile *file;
   gchar *full_path;
 
-  g_return_if_fail (WORDS_IS_DICTIONARY (self));
+  g_return_if_fail (GW_IS_DICTIONARY (self));
   g_return_if_fail (resource_path != NULL);
 
   if (g_str_has_prefix (resource_path, "resource://"))
@@ -433,7 +433,7 @@ words_dictionary_load_from_resource (WordsDictionary     *self,
 
   file = g_file_new_for_uri (full_path);
 
-  words_dictionary_load_from_gfile (self,
+  gw_dictionary_load_from_gfile (self,
                                     file,
                                     delimiter,
                                     callback,
@@ -445,19 +445,19 @@ words_dictionary_load_from_resource (WordsDictionary     *self,
 }
 
 /**
- * words_dictionary_load_from_file_finish:
+ * gw_dictionary_load_from_file_finish:
  * @result: a #GAsyncResult
  * @error: (nullable): return location for a #GError
  *
- * Finished the operation started by words_dictionary_load_from_file().
+ * Finished the operation started by gw_dictionary_load_from_file().
  *
  * Returns: %TRUE if the load was successfull, %FALSE otherwise.
  *
  * Since: 0.1.0
  */
 gboolean
-words_dictionary_load_from_resource_finish (GAsyncResult  *result,
-                                            GError       **error)
+gw_dictionary_load_from_resource_finish (GAsyncResult  *result,
+                                         GError       **error)
 {
   g_return_val_if_fail (G_IS_TASK (result), FALSE);
   g_return_val_if_fail (!error || !*error, FALSE);
@@ -466,8 +466,8 @@ words_dictionary_load_from_resource_finish (GAsyncResult  *result,
 }
 
 /**
- * words_dictionary_load_from_file_sync:
- * @self: a #WordsDictionary
+ * gw_dictionary_load_from_file_sync:
+ * @self: a #GwDictionary
  * @file_path: location of the file to load
  * @delimiter: (nullable): delimitir to split the file contents
  * @cancellable: (nullable): cancellable to cancel the operation
@@ -475,7 +475,7 @@ words_dictionary_load_from_resource_finish (GAsyncResult  *result,
  *
  * Reads the contents of @file_path into @self.
  *
- * This method blocks the mainloop. See words_dictionary_load_from_file() for
+ * This method blocks the mainloop. See gw_dictionary_load_from_file() for
  * the asynchronous variant.
  *
  * Returns: %TRUE if the load was successfull, %FALSE otherwise.
@@ -483,17 +483,17 @@ words_dictionary_load_from_resource_finish (GAsyncResult  *result,
  * Since: 0.1.0
  */
 gboolean
-words_dictionary_load_from_resource_sync (WordsDictionary  *self,
-                                          const gchar      *resource_path,
-                                          const gchar      *delimiter,
-                                          GCancellable     *cancellable,
-                                          GError          **error)
+gw_dictionary_load_from_resource_sync (GwDictionary  *self,
+                                       const gchar      *resource_path,
+                                       const gchar      *delimiter,
+                                       GCancellable     *cancellable,
+                                       GError          **error)
 {
   GFile *file;
   gboolean retval;
   gchar *full_path;
 
-  g_return_val_if_fail (WORDS_IS_DICTIONARY (self), FALSE);
+  g_return_val_if_fail (GW_IS_DICTIONARY (self), FALSE);
   g_return_val_if_fail (!error || !*error, FALSE);
   g_return_val_if_fail (resource_path != NULL, FALSE);
 
@@ -504,7 +504,7 @@ words_dictionary_load_from_resource_sync (WordsDictionary  *self,
 
   file = g_file_new_for_uri (full_path);
 
-  retval = words_dictionary_load_from_gfile_sync (self,
+  retval = gw_dictionary_load_from_gfile_sync (self,
                                                   file,
                                                   delimiter,
                                                   cancellable,
@@ -516,8 +516,8 @@ words_dictionary_load_from_resource_sync (WordsDictionary  *self,
 }
 
 /**
- * words_dictionary_load_from_file:
- * @self: a #WordsDictionary
+ * gw_dictionary_load_from_file:
+ * @self: a #GwDictionary
  * @file: a #GFile
  * @delimiter: (nullable): the delimiter to split the file contents
  * @callback: (): callback to call when the operation is done
@@ -528,22 +528,22 @@ words_dictionary_load_from_resource_sync (WordsDictionary  *self,
  * the newline is used instead.
  *
  * This method has the same effect of creating a #GFile and loading
- * with words_dictionary_load_from_gfile().
+ * with gw_dictionary_load_from_gfile().
  *
  * Since: 0.1.0
  */
 void
-words_dictionary_load_from_gfile (WordsDictionary     *self,
-                                  GFile               *file,
-                                  const gchar         *delimiter,
-                                  GAsyncReadyCallback  callback,
-                                  GCancellable        *cancellable,
-                                  gpointer             user_data)
+gw_dictionary_load_from_gfile (GwDictionary     *self,
+                               GFile               *file,
+                               const gchar         *delimiter,
+                               GAsyncReadyCallback  callback,
+                               GCancellable        *cancellable,
+                               gpointer             user_data)
 {
   TaskData *data;
   GTask *task;
 
-  g_return_if_fail (WORDS_IS_DICTIONARY (self));
+  g_return_if_fail (GW_IS_DICTIONARY (self));
   g_return_if_fail (file != NULL);
 
   data = g_new0 (TaskData, 1);
@@ -557,19 +557,19 @@ words_dictionary_load_from_gfile (WordsDictionary     *self,
 }
 
 /**
- * words_dictionary_load_from_gfile_finish:
+ * gw_dictionary_load_from_gfile_finish:
  * @result: a #GAsyncResult
  * @error: (nullable): return location for a #GError
  *
- * Finished the operation started by words_dictionary_load_from_file().
+ * Finished the operation started by gw_dictionary_load_from_file().
  *
  * Returns: %TRUE if the load was successfull, %FALSE otherwise.
  *
  * Since: 0.1.0
  */
 gboolean
-words_dictionary_load_from_gfile_finish (GAsyncResult  *result,
-                                         GError       **error)
+gw_dictionary_load_from_gfile_finish (GAsyncResult  *result,
+                                      GError       **error)
 {
   g_return_val_if_fail (G_IS_TASK (result), FALSE);
   g_return_val_if_fail (!error || !*error, FALSE);
@@ -578,8 +578,8 @@ words_dictionary_load_from_gfile_finish (GAsyncResult  *result,
 }
 
 /**
- * words_dictionary_load_from_gfile_sync:
- * @self: a #WordsDictionary
+ * gw_dictionary_load_from_gfile_sync:
+ * @self: a #GwDictionary
  * @file: a #GFile
  * @delimiter: (nullable): delimitir to split the file contents
  * @cancellable: (nullable): cancellable to cancel the operation
@@ -587,7 +587,7 @@ words_dictionary_load_from_gfile_finish (GAsyncResult  *result,
  *
  * Reads the contents of @file into @self.
  *
- * This method blocks the mainloop. See words_dictionary_load_from_gfile() for
+ * This method blocks the mainloop. See gw_dictionary_load_from_gfile() for
  * the asynchronous variant.
  *
  * Returns: %TRUE if the load was successfull, %FALSE otherwise.
@@ -595,18 +595,18 @@ words_dictionary_load_from_gfile_finish (GAsyncResult  *result,
  * Since: 0.1.0
  */
 gboolean
-words_dictionary_load_from_gfile_sync (WordsDictionary  *self,
-                                       GFile            *file,
-                                       const gchar      *delimiter,
-                                       GCancellable     *cancellable,
-                                       GError          **error)
+gw_dictionary_load_from_gfile_sync (GwDictionary  *self,
+                                    GFile            *file,
+                                    const gchar      *delimiter,
+                                    GCancellable     *cancellable,
+                                    GError          **error)
 {
   gboolean success;
   GStrv split_content;
   gchar *contents;
   gint i;
 
-  g_return_val_if_fail (WORDS_IS_DICTIONARY (self), FALSE);
+  g_return_val_if_fail (GW_IS_DICTIONARY (self), FALSE);
   g_return_val_if_fail (!error || !*error, FALSE);
   g_return_val_if_fail (file != NULL, FALSE);
 
@@ -632,7 +632,7 @@ words_dictionary_load_from_gfile_sync (WordsDictionary  *self,
       if (g_cancellable_set_error_if_cancelled (cancellable, error))
         break;
 
-      words_dictionary_insert (self, split_content[i], -1);
+      gw_dictionary_insert (self, split_content[i], -1);
     }
 
   g_clear_pointer (&split_content, g_strfreev);

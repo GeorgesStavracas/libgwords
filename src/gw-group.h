@@ -1,4 +1,4 @@
-/* words-group.h
+/* gw-group.h
  *
  * Copyright (C) 2016 Georges Basile Stavracas Neto <georges.stavracas@gmail.com>
  *
@@ -16,44 +16,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WORDS_GROUP_H
-#define WORDS_GROUP_H
+#ifndef GW_GROUP_H
+#define GW_GROUP_H
 
 #include <glib-object.h>
 
 G_BEGIN_DECLS
 
-#define WORDS_TYPE_GROUP (words_group_get_type())
+#define GW_TYPE_GROUP (gw_group_get_type())
 
-typedef struct _WordsGroup WordsGroup;
+typedef struct _GwGroup GwGroup;
 
-GType                words_group_get_type                        (void) G_GNUC_CONST;
+GType                gw_group_get_type                           (void) G_GNUC_CONST;
 
-WordsGroup*          words_group_new                             (const gchar        *group_id);
+GwGroup*             gw_group_new                                (const gchar        *group_id);
 
-WordsGroup*          words_group_copy                            (WordsGroup         *self);
+GwGroup*             gw_group_copy                               (GwGroup            *self);
 
-WordsGroup*          words_group_ref                             (WordsGroup         *self);
+GwGroup*             gw_group_ref                                (GwGroup            *self);
 
-void                 words_group_unref                           (WordsGroup         *self);
+void                 gw_group_unref                              (GwGroup            *self);
 
-void                 words_group_insert_word                     (WordsGroup         *self,
+void                 gw_group_insert_word                        (GwGroup            *self,
                                                                   const gchar        *word,
                                                                   gsize               word_length);
 
-void                 words_group_remove_word                     (WordsGroup         *self,
+void                 gw_group_remove_word                        (GwGroup            *self,
                                                                   const gchar        *word,
                                                                   gsize               word_length);
 
-gboolean             words_group_contains_word                   (WordsGroup         *self,
+gboolean             gw_group_contains_word                      (GwGroup            *self,
                                                                   const gchar        *word,
                                                                   gsize               word_length);
 
-GStrv                words_group_get_words                       (WordsGroup         *self);
+GStrv                gw_group_get_gw                             (GwGroup            *self);
 
-G_DEFINE_AUTOPTR_CLEANUP_FUNC (WordsGroup, words_group_unref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (GwGroup, gw_group_unref)
 
 G_END_DECLS
 
-#endif /* WORDS_GROUP_H */
+#endif /* GW_GROUP_H */
 

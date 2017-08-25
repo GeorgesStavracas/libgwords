@@ -1,4 +1,4 @@
-/* words.h
+/* gwords.h
  *
  * Copyright (C) 2016 Georges Basile Stavracas Neto
  *
@@ -16,20 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WORDS_H
-#define WORDS_H
+#ifndef GWORDS_H
+#define GWORDS_H
 
 #include <glib.h>
 
 G_BEGIN_DECLS
 
-#define WORDS_INSIDE
-# include "words-dictionary.h"
-# include "words-group.h"
-# include "words-radix-tree.h"
-# include "words-version.h"
-#undef WORDS_INSIDE
+#define GWORDS_INSIDE
+# include "gw-dictionary.h"
+# include "gw-group.h"
+# include "gw-radix-tree.h"
+# include "gw-version.h"
+#undef GWORDS_INSIDE
 
 G_END_DECLS
 
-#endif /* WORDS_H */
+#endif /* GWORDS_H */

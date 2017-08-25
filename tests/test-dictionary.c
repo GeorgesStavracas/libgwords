@@ -17,16 +17,16 @@
  */
 
 #include "test-config.h"
-#include "words.h"
+#include "gwords.h"
 
 /*****************************************************************************/
 
 static void
 dictionary_init (void)
 {
-  WordsDictionary *dict;
+  GwDictionary *dict;
 
-  dict = words_dictionary_new ();
+  dict = gw_dictionary_new ();
 
   g_clear_object (&dict);
 }
@@ -36,16 +36,16 @@ dictionary_init (void)
 static void
 dictionary_insert (void)
 {
-  WordsDictionary *dict;
+  GwDictionary *dict;
   gint i;
 
-  dict = words_dictionary_new ();
+  dict = gw_dictionary_new ();
 
   for (i = 0; i < 100000; i++)
     {
       gchar *str = g_strdup_printf ("test%d", i);
 
-      words_dictionary_insert (dict, str, -1);
+      gw_dictionary_insert (dict, str, -1);
 
       g_free (str);
     }
@@ -58,16 +58,16 @@ dictionary_insert (void)
 static void
 dictionary_remove (void)
 {
-  WordsDictionary *dict;
+  GwDictionary *dict;
   gint i;
 
-  dict = words_dictionary_new ();
+  dict = gw_dictionary_new ();
 
   for (i = 0; i < 100000; i++)
     {
       gchar *str = g_strdup_printf ("test%d", i);
 
-      words_dictionary_insert (dict, str, -1);
+      gw_dictionary_insert (dict, str, -1);
 
       g_free (str);
     }
@@ -76,7 +76,7 @@ dictionary_remove (void)
     {
       gchar *str = g_strdup_printf ("test%d", i);
 
-      words_dictionary_remove (dict, str, -1);
+      gw_dictionary_remove (dict, str, -1);
 
       g_free (str);
     }
@@ -89,18 +89,18 @@ dictionary_remove (void)
 static void
 dictionary_load_file_ok (void)
 {
-  WordsDictionary *dict;
+  GwDictionary *dict;
   GError *error;
   gboolean success;
 
-  dict = words_dictionary_new ();
+  dict = gw_dictionary_new ();
   error = NULL;
 
-  success = words_dictionary_load_from_file_sync (dict,
-                                                  TESTDIR"/english-words.txt",
-                                                  NULL,
-                                                  NULL,
-                                                  &error);
+  success = gw_dictionary_load_from_file_sync (dict,
+                                               TESTDIR"/english-words.txt",
+                                               NULL,
+                                               NULL,
+                                               &error);
 
   g_assert (success && !error);
 
@@ -112,18 +112,18 @@ dictionary_load_file_ok (void)
 static void
 dictionary_load_file_error (void)
 {
-  WordsDictionary *dict;
+  GwDictionary *dict;
   GError *error;
   gboolean success;
 
-  dict = words_dictionary_new ();
+  dict = gw_dictionary_new ();
   error = NULL;
 
-  success = words_dictionary_load_from_file_sync (dict,
-                                                  "i_shouldnt_exist",
-                                                  NULL,
-                                                  NULL,
-                                                  &error);
+  success = gw_dictionary_load_from_file_sync (dict,
+                                               "i_shouldnt_exist",
+                                               NULL,
+                                               NULL,
+                                               &error);
 
   g_assert (!success && error);
 
@@ -137,13 +137,13 @@ file_loaded_cb (GObject      *source_object,
                 GAsyncResult *res,
                 gpointer      user_data)
 {
-  WordsDictionary *dict;
+  GwDictionary *dict;
   GError *error;
   gboolean success;
 
-  dict = WORDS_DICTIONARY (source_object);
+  dict = GW_DICTIONARY (source_object);
   error = NULL;
-  success = words_dictionary_load_from_file_finish (res, &error);
+  success = gw_dictionary_load_from_file_finish (res, &error);
 
   g_assert (success && !error);
 
@@ -155,18 +155,18 @@ file_loaded_cb (GObject      *source_object,
 static void
 dictionary_load_file_ok_async (void)
 {
-  WordsDictionary *dict;
+  GwDictionary *dict;
   GMainLoop *mainloop;
 
-  dict = words_dictionary_new ();
+  dict = gw_dictionary_new ();
   mainloop = g_main_loop_new (NULL, FALSE);
 
-  words_dictionary_load_from_file (dict,
-                                   TESTDIR"/english-words.txt",
-                                   NULL,
-                                   file_loaded_cb,
-                                   NULL,
-                                   mainloop);
+  gw_dictionary_load_from_file (dict,
+                                TESTDIR"/english-words.txt",
+                                NULL,
+                                file_loaded_cb,
+                                NULL,
+                                mainloop);
 
   g_main_loop_run (mainloop);
 }
@@ -178,13 +178,13 @@ file_loaded_error_cb (GObject      *source_object,
                       GAsyncResult *res,
                       gpointer      user_data)
 {
-  WordsDictionary *dict;
+  GwDictionary *dict;
   GError *error;
   gboolean success;
 
-  dict = WORDS_DICTIONARY (source_object);
+  dict = GW_DICTIONARY (source_object);
   error = NULL;
-  success = words_dictionary_load_from_file_finish (res, &error);
+  success = gw_dictionary_load_from_file_finish (res, &error);
 
   g_assert (!success && error);
 
@@ -196,18 +196,18 @@ file_loaded_error_cb (GObject      *source_object,
 static void
 dictionary_load_file_error_async (void)
 {
-  WordsDictionary *dict;
+  GwDictionary *dict;
   GMainLoop *mainloop;
 
-  dict = words_dictionary_new ();
+  dict = gw_dictionary_new ();
   mainloop = g_main_loop_new (NULL, FALSE);
 
-  words_dictionary_load_from_file (dict,
-                                   "i_shouldnt_exist",
-                                   NULL,
-                                   file_loaded_error_cb,
-                                   NULL,
-                                   mainloop);
+  gw_dictionary_load_from_file (dict,
+                                "i_shouldnt_exist",
+                                NULL,
+                                file_loaded_error_cb,
+                                NULL,
+                                mainloop);
 
   g_main_loop_run (mainloop);
 }

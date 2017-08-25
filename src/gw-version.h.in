@@ -1,0 +1,97 @@
+/* gw-version.h.in
+ *
+ * Copyright (C) 2016 Georges Basile Stavracas Neto
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifndef GW_VERSION_H
+#define GW_VERSION_H
+
+#if !defined(GW_INSIDE) && !defined(GW_COMPILATION)
+# error "Only <gwords.h> can be included directly."
+#endif
+
+/**
+ * SECTION:gw-version
+ * @short_description: libgwords version checking
+ *
+ * libgwords provides macros to check the version of the library
+ * at compile-time
+ */
+
+/**
+ * GW_MAJOR_VERSION:
+ *
+ * libgwords major version component (e.g. 1 if %GW_VERSION is 1.2.3)
+ */
+#define GW_MAJOR_VERSION (@MAJOR_VERSION@)
+
+/**
+ * GW_MINOR_VERSION:
+ *
+ * libgwords minor version component (e.g. 2 if %GW_VERSION is 1.2.3)
+ */
+#define GW_MINOR_VERSION (@MINOR_VERSION@)
+
+/**
+ * GW_MICRO_VERSION:
+ *
+ * libgwords micro version component (e.g. 3 if %GW_VERSION is 1.2.3)
+ */
+#define GW_MICRO_VERSION (@MICRO_VERSION@)
+
+/**
+ * GW_VERSION
+ *
+ * libgwords version.
+ */
+#define GW_VERSION (@VERSION@)
+
+/**
+ * GW_VERSION_S:
+ *
+ * libgwords version, encoded as a string, useful for printing and
+ * libgwords.
+ */
+#define GW_VERSION_S "@VERSION@"
+
+#define GW_ENCODE_VERSION(major,minor,micro) \
+        ((major) << 24 | (minor) << 16 | (micro) << 8)
+
+/**
+ * GW_VERSION_HEX:
+ *
+ * libgwords version, encoded as an hexadecimal number, useful for
+ * integer comparisons.
+ */
+#define GW_VERSION_HEX \
+        (GW_ENCODE_VERSION (GW_MAJOR_VERSION, GW_MINOR_VERSION, GW_MICRO_VERSION))
+
+/**
+ * GW_CHECK_VERSION:
+ * @major: required major version
+ * @minor: required minor version
+ * @micro: required micro version
+ *
+ * Compile-time version checking. Evaluates to %TRUE if the version
+ * of libgwords is greater than the required one.
+ */
+#define GW_CHECK_VERSION(major,minor,micro)   \
+        (GW_MAJOR_VERSION > (major) || \
+         (GW_MAJOR_VERSION == (major) && GW_MINOR_VERSION > (minor)) || \
+         (GW_MAJOR_VERSION == (major) && GW_MINOR_VERSION == (minor) && \
+          GW_MICRO_VERSION >= (micro)))
+
+#endif /* GW_VERSION_H */

@@ -1,4 +1,4 @@
-/* words-radix-tree.h
+/* gw-radix-tree.h
  *
  * Copyright (C) 2016 Georges Basile Stavracas Neto <georges.stavracas@gmail.com>
  *
@@ -16,72 +16,72 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WORDS_RADIX_TREE_H
-#define WORDS_RADIX_TREE_H
+#ifndef GW_RADIX_TREE_H
+#define GW_RADIX_TREE_H
 
 #include <glib-object.h>
 
 G_BEGIN_DECLS
 
-#define WORDS_TYPE_RADIX_TREE (words_radix_tree_get_type())
+#define GW_TYPE_RADIX_TREE (gw_radix_tree_get_type())
 
-G_DECLARE_DERIVABLE_TYPE (WordsRadixTree, words_radix_tree, WORDS, RADIX_TREE, GObject)
+G_DECLARE_DERIVABLE_TYPE (GwRadixTree, gw_radix_tree, GW, RADIX_TREE, GObject)
 
-struct _WordsRadixTreeClass
+struct _GwRadixTreeClass
 {
   GObjectClass        parent;
 };
 
-#define WORDS_RADIX_TREE_ITER_STOP     TRUE
-#define WORDS_RADIX_TREE_ITER_CONTINUE FALSE
+#define GW_RADIX_TREE_ITER_STOP     TRUE
+#define GW_RADIX_TREE_ITER_CONTINUE FALSE
 
 /**
  * Returns %TRUE to stop, %FALSE to continue.
  */
 typedef gboolean     (*RadixTreeCb)                               (const gchar       *key,
-								   gsize              key_length,
+                                                                   gsize              key_length,
                                                                    gpointer           value,
                                                                    gpointer           user_data);
 
-WordsRadixTree*      words_radix_tree_new                        (void);
+GwRadixTree*         gw_radix_tree_new                           (void);
 
-WordsRadixTree*      words_radix_tree_new_with_free_func         (GDestroyNotify      destroy_func);
+GwRadixTree*         gw_radix_tree_new_with_free_func            (GDestroyNotify      destroy_func);
 
-gboolean             words_radix_tree_contains                   (WordsRadixTree     *tree,
+gboolean             gw_radix_tree_contains                      (GwRadixTree     *tree,
                                                                   const gchar        *key,
                                                                   gsize               key_length);
 
-gpointer             words_radix_tree_lookup                     (WordsRadixTree     *tree,
+gpointer             gw_radix_tree_lookup                        (GwRadixTree     *tree,
                                                                   const gchar        *key,
                                                                   gsize               key_length,
                                                                   gboolean           *found);
 
-gboolean             words_radix_tree_insert                     (WordsRadixTree     *tree,
+gboolean             gw_radix_tree_insert                        (GwRadixTree     *tree,
                                                                   const gchar        *key,
                                                                   gsize               key_length,
                                                                   gpointer            value);
 
-void                 words_radix_tree_clear                      (WordsRadixTree     *tree);
+void                 gw_radix_tree_clear                         (GwRadixTree     *tree);
 
-gint                 words_radix_tree_get_size                   (WordsRadixTree     *tree);
+gint                 gw_radix_tree_get_size                      (GwRadixTree     *tree);
 
-gboolean             words_radix_tree_iter                       (WordsRadixTree     *tree,
+gboolean             gw_radix_tree_iter                          (GwRadixTree     *tree,
                                                                   RadixTreeCb         callback,
                                                                   gpointer            user_data);
 
-GStrv                words_radix_tree_get_keys                   (WordsRadixTree     *tree);
+GStrv                gw_radix_tree_get_keys                      (GwRadixTree     *tree);
 
-GPtrArray*           words_radix_tree_get_values                 (WordsRadixTree     *tree);
+GPtrArray*           gw_radix_tree_get_values                    (GwRadixTree     *tree);
 
-void                 words_radix_tree_remove                     (WordsRadixTree     *tree,
+void                 gw_radix_tree_remove                        (GwRadixTree     *tree,
                                                                   const gchar        *key,
                                                                   gsize               key_length);
 
-void                 words_radix_tree_steal                      (WordsRadixTree     *tree,
+void                 gw_radix_tree_steal                         (GwRadixTree     *tree,
                                                                   const gchar        *key,
                                                                   gsize               key_length);
 
 G_END_DECLS
 
-#endif /* WORDS_RADIX_TREE_H */
+#endif /* GW_RADIX_TREE_H */
 

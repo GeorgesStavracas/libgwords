@@ -1,4 +1,4 @@
-/* words-language.h
+/* gw-language.h
  *
  * Copyright (C) 2017 Georges Basile Stavracas Neto <georges.stavracas@gmail.com>
  *
@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WORDS_LANGUAGE_H
-#define WORDS_LANGUAGE_H
+#ifndef GW_LANGUAGE_H
+#define GW_LANGUAGE_H
 
 #include <gio/gio.h>
 #include <glib.h>
@@ -26,37 +26,37 @@
 G_BEGIN_DECLS
 
 /**
- * WordsLanguageError:
- * @WORDS_LANGUAGE_ERROR_INVALID: indicated an invalid language
+ * GwLanguageError:
+ * @GW_LANGUAGE_ERROR_INVALID: indicated an invalid language
  *
- * Errors that #WordsLanguage can generate.
+ * Errors that #GwLanguage can generate.
  */
 typedef enum
 {
-  WORDS_LANGUAGE_ERROR_INVALID,
-} WordsLanguageError;
+  GW_LANGUAGE_ERROR_INVALID,
+} GwLanguageError;
 
-#define WODS_LANGUAGE_ERROR (words_language_error_quark ())
+#define WODS_LANGUAGE_ERROR (gw_language_error_quark ())
 
-#define WORDS_TYPE_LANGUAGE (words_language_get_type())
+#define GW_TYPE_LANGUAGE (gw_language_get_type())
 
-G_DECLARE_FINAL_TYPE (WordsLanguage, words_language, WORDS, LANGUAGE, GObject)
+G_DECLARE_FINAL_TYPE (GwLanguage, gw_language, GW, LANGUAGE, GObject)
 
-GQuark               words_language_error_quark                  (void);
+GQuark               gw_language_error_quark                     (void);
 
-void                 words_language_new                          (const gchar        *language,
+void                 gw_language_new                             (const gchar        *language,
                                                                   GCancellable       *cancellable,
                                                                   GAsyncReadyCallback callback,
                                                                   gpointer            user_data);
 
-WordsLanguage*       words_language_new_finish                   (GAsyncResult       *result,
+GwLanguage*          gw_language_new_finish                      (GAsyncResult       *result,
                                                                   GError            **error);
 
-WordsLanguage*       words_language_new_sync                     (const gchar        *language,
+GwLanguage*          gw_language_new_sync                        (const gchar        *language,
                                                                   GCancellable       *cancellable,
                                                                   GError            **error);
 
 G_END_DECLS
 
-#endif /* WORDS_LANGUAGE_H */
+#endif /* GW_LANGUAGE_H */
 

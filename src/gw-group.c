@@ -1,4 +1,4 @@
-/* words-group.c
+/* gw-group.c
  *
  * Copyright (C) 2016 Georges Basile Stavracas Neto <georges.stavracas@gmail.com>
  *
@@ -16,59 +16,59 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "words-group.h"
-#include "words-radix-tree.h"
+#include "gw-group.h"
+#include "gw-radix-tree.h"
 
-struct _WordsGroup
+struct _GwGroup
 {
   guint               ref_count;
 
   const gchar        *group_id;
 
-  WordsRadixTree     *words;
+  GwRadixTree     *gw;
 };
 
-G_DEFINE_BOXED_TYPE (WordsGroup, words_group, words_group_ref, words_group_unref)
+G_DEFINE_BOXED_TYPE (GwGroup, gw_group, gw_group_ref, gw_group_unref)
 
-WordsGroup*
-words_group_new (const gchar *group_id)
+GwGroup*
+gw_group_new (const gchar *group_id)
 {
-  WordsGroup *self;
+  GwGroup *self;
 
-  self = g_slice_new0 (WordsGroup);
+  self = g_slice_new0 (GwGroup);
   self->group_id = group_id;
   self->ref_count = 1;
-  self->words = words_radix_tree_new ();
+  self->gw = gw_radix_tree_new ();
 
   return self;
 }
 
-WordsGroup*
-words_group_copy (WordsGroup *self)
+GwGroup*
+gw_group_copy (GwGroup *self)
 {
-  WordsGroup *copy;
+  GwGroup *copy;
 
   g_return_val_if_fail (self, NULL);
   g_return_val_if_fail (self->ref_count, NULL);
 
-  copy = words_group_new (self->group_id);
+  copy = gw_group_new (self->group_id);
 
   return copy;
 }
 
 static void
-words_group_free (WordsGroup *self)
+gw_group_free (GwGroup *self)
 {
   g_assert (self);
   g_assert_cmpint (self->ref_count, ==, 0);
 
-  g_clear_object (&self->words);
+  g_clear_object (&self->gw);
 
-  g_slice_free (WordsGroup, self);
+  g_slice_free (GwGroup, self);
 }
 
-WordsGroup*
-words_group_ref (WordsGroup *self)
+GwGroup*
+gw_group_ref (GwGroup *self)
 {
   g_return_val_if_fail (self, NULL);
   g_return_val_if_fail (self->ref_count, NULL);
@@ -79,18 +79,18 @@ words_group_ref (WordsGroup *self)
 }
 
 void
-words_group_unref (WordsGroup *self)
+gw_group_unref (GwGroup *self)
 {
   g_return_if_fail (self);
   g_return_if_fail (self->ref_count);
 
   if (g_atomic_int_dec_and_test (&self->ref_count))
-    words_group_free (self);
+    gw_group_free (self);
 }
 
 /**
- * words_group_insert_word:
- * @self: a #WordsGroup
+ * gw_group_insert_word:
+ * @self: a #GwGroup
  * @word: a word to be added to @self
  * @word_length: length of @word, or -1
  *
@@ -99,16 +99,16 @@ words_group_unref (WordsGroup *self)
  * Since: 0.1.0
  */
 void
-words_group_insert_word (WordsGroup  *self,
-                         const gchar *word,
-                         gsize        word_length)
+gw_group_insert_word (GwGroup     *self,
+                      const gchar *word,
+                      gsize        word_length)
 {
-  words_radix_tree_insert (self->words, word, word_length, NULL);
+  gw_radix_tree_insert (self->gw, word, word_length, NULL);
 }
 
 /**
- * words_group_remove_word:
- * @self: a #WordsGroup
+ * gw_group_remove_word:
+ * @self: a #GwGroup
  * @word: a word to be removed from @self
  * @word_length: length of @word, or -1
  *
@@ -117,16 +117,16 @@ words_group_insert_word (WordsGroup  *self,
  * Since: 0.1.0
  */
 void
-words_group_remove_word (WordsGroup  *self,
-                         const gchar *word,
-                         gsize        word_length)
+gw_group_remove_word (GwGroup     *self,
+                      const gchar *word,
+                      gsize        word_length)
 {
-  words_radix_tree_remove (self->words, word, word_length);
+  gw_radix_tree_remove (self->gw, word, word_length);
 }
 
 /**
- * words_group_contains_word:
- * @self: a #WordsGroup
+ * gw_group_contains_word:
+ * @self: a #GwGroup
  * @word: a word to be search in @self
  * @word_length: length of @word, or -1
  *
@@ -137,25 +137,25 @@ words_group_remove_word (WordsGroup  *self,
  * Since: 0.1.0
  */
 gboolean
-words_group_contains_word (WordsGroup  *self,
-                           const gchar *word,
-                           gsize        word_length)
+gw_group_contains_word (GwGroup     *self,
+                        const gchar *word,
+                        gsize        word_length)
 {
-  return words_radix_tree_contains (self->words, word, word_length);
+  return gw_radix_tree_contains (self->gw, word, word_length);
 }
 
 /**
- * words_group_get_words:
- * @self: a #WordsGroup
+ * gw_group_get_gw:
+ * @self: a #GwGroup
  *
- * Retrieves all the words in @self.
+ * Retrieves all the gw in @self.
  *
- * Returns: (nullable)(transfer full): a list of words. Free with g_strfreev().
+ * Returns: (nullable)(transfer full): a list of gw. Free with g_strfreev().
  *
  * Since: 0.1.0
  */
 GStrv
-words_group_get_words (WordsGroup *self)
+gw_group_get_gw (GwGroup *self)
 {
-  return words_radix_tree_get_keys (self->words);
+  return gw_radix_tree_get_keys (self->gw);
 }

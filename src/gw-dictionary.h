@@ -1,4 +1,4 @@
-/* words-dictionary.h
+/* gw-dictionary.h
  *
  * Copyright (C) 2016 Georges Basile Stavracas Neto <georges.stavracas@gmail.com>
  *
@@ -16,82 +16,82 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WORDS_DICTIONARY_H
-#define WORDS_DICTIONARY_H
+#ifndef GW_DICTIONARY_H
+#define GW_DICTIONARY_H
 
 #include <glib-object.h>
 #include <gio/gio.h>
 
 G_BEGIN_DECLS
 
-#define WORDS_TYPE_DICTIONARY (words_dictionary_get_type())
+#define GW_TYPE_DICTIONARY (gw_dictionary_get_type())
 
-G_DECLARE_DERIVABLE_TYPE (WordsDictionary, words_dictionary, WORDS, DICTIONARY, GObject)
+G_DECLARE_DERIVABLE_TYPE (GwDictionary, gw_dictionary, GW, DICTIONARY, GObject)
 
-struct _WordsDictionaryClass
+struct _GwDictionaryClass
 {
   GObjectClass        parent;
 };
 
-WordsDictionary*     words_dictionary_new                        (void);
+GwDictionary*        gw_dictionary_new                           (void);
 
-gboolean             words_dictionary_contains                   (WordsDictionary    *self,
+gboolean             gw_dictionary_contains                      (GwDictionary       *self,
                                                                   const gchar        *word,
                                                                   gsize               word_length);
 
-void                 words_dictionary_insert                     (WordsDictionary    *self,
+void                 gw_dictionary_insert                        (GwDictionary       *self,
                                                                   const gchar        *word,
                                                                   gsize               word_length);
 
-void                 words_dictionary_remove                     (WordsDictionary    *self,
+void                 gw_dictionary_remove                        (GwDictionary       *self,
                                                                   const gchar        *word,
                                                                   gsize               word_length);
 
-void                 words_dictionary_load_from_file             (WordsDictionary     *self,
+void                 gw_dictionary_load_from_file                (GwDictionary        *self,
                                                                   const gchar         *file_path,
                                                                   const gchar         *delimiter,
                                                                   GAsyncReadyCallback  callback,
                                                                   GCancellable        *cancellable,
                                                                   gpointer             user_data);
 
-gboolean             words_dictionary_load_from_file_finish      (GAsyncResult       *result,
+gboolean             gw_dictionary_load_from_file_finish         (GAsyncResult       *result,
                                                                   GError            **error);
 
-gboolean             words_dictionary_load_from_file_sync        (WordsDictionary    *self,
+gboolean             gw_dictionary_load_from_file_sync           (GwDictionary       *self,
                                                                   const gchar        *file_path,
                                                                   const gchar        *delimiter,
                                                                   GCancellable       *cancellable,
                                                                   GError            **error);
 
 
-void                 words_dictionary_load_from_resource         (WordsDictionary     *self,
+void                 gw_dictionary_load_from_resource            (GwDictionary        *self,
                                                                   const gchar         *resource_path,
                                                                   const gchar         *delimiter,
                                                                   GAsyncReadyCallback  callback,
                                                                   GCancellable        *cancellable,
                                                                   gpointer             user_data);
 
-gboolean             words_dictionary_load_from_resource_finish  (GAsyncResult       *result,
+gboolean             gw_dictionary_load_from_resource_finish     (GAsyncResult       *result,
                                                                   GError            **error);
 
-gboolean             words_dictionary_load_from_resource_sync    (WordsDictionary    *self,
+gboolean             gw_dictionary_load_from_resource_sync       (GwDictionary       *self,
                                                                   const gchar        *resource_path,
                                                                   const gchar        *delimiter,
                                                                   GCancellable       *cancellable,
                                                                   GError            **error);
 
 
-void                 words_dictionary_load_from_gfile            (WordsDictionary     *self,
+void                 gw_dictionary_load_from_gfile               (GwDictionary        *self,
                                                                   GFile               *file,
                                                                   const gchar         *delimiter,
                                                                   GAsyncReadyCallback  callback,
                                                                   GCancellable        *cancellable,
                                                                   gpointer             user_data);
 
-gboolean             words_dictionary_load_from_gfile_finish     (GAsyncResult       *result,
+gboolean             gw_dictionary_load_from_gfile_finish        (GAsyncResult       *result,
                                                                   GError            **error);
 
-gboolean             words_dictionary_load_from_gfile_sync       (WordsDictionary    *self,
+gboolean             gw_dictionary_load_from_gfile_sync          (GwDictionary       *self,
                                                                   GFile              *file,
                                                                   const gchar        *delimiter,
                                                                   GCancellable       *cancellable,
@@ -99,5 +99,5 @@ gboolean             words_dictionary_load_from_gfile_sync       (WordsDictionar
 
 G_END_DECLS
 
-#endif /* WORDS_DICTIONARY_H */
+#endif /* GW_DICTIONARY_H */
 

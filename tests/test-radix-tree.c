@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "words.h"
+#include "gwords.h"
 
 #include <time.h>
 
@@ -25,9 +25,9 @@
 static void
 radix_tree_init (void)
 {
-  WordsRadixTree *tree;
+  GwRadixTree *tree;
 
-  tree = words_radix_tree_new ();
+  tree = gw_radix_tree_new ();
 
   g_clear_object (&tree);
 }
@@ -37,15 +37,15 @@ radix_tree_init (void)
 static void
 radix_tree_low_entries (void)
 {
-  WordsRadixTree *tree;
+  GwRadixTree *tree;
 
-  tree = words_radix_tree_new ();
+  tree = gw_radix_tree_new ();
 
-  words_radix_tree_insert (tree, "Albums", -1, NULL);
-  words_radix_tree_insert (tree, "Music", -1, NULL);
-  words_radix_tree_insert (tree, "Test", -1, NULL);
-  words_radix_tree_insert (tree, "Firefox", -1, NULL);
-  words_radix_tree_insert (tree, "Yay", -1, NULL);
+  gw_radix_tree_insert (tree, "Albums", -1, NULL);
+  gw_radix_tree_insert (tree, "Music", -1, NULL);
+  gw_radix_tree_insert (tree, "Test", -1, NULL);
+  gw_radix_tree_insert (tree, "Firefox", -1, NULL);
+  gw_radix_tree_insert (tree, "Yay", -1, NULL);
 
   g_clear_object (&tree);
 }
@@ -55,12 +55,12 @@ radix_tree_low_entries (void)
 static void
 radix_tree_n_entries (guint n)
 {
-  WordsRadixTree *tree;
+  GwRadixTree *tree;
   gdouble sum;
   gchar key[20] = { '\0', };
   gint i, n_iterations;
 
-  tree = words_radix_tree_new ();
+  tree = gw_radix_tree_new ();
   sum = 0;
   n_iterations = 10000000 / n;
 
@@ -75,10 +75,10 @@ radix_tree_n_entries (guint n)
       for (j = 0; j < n; j++)
         {
           g_snprintf (key, 20, "test%d", j);
-          words_radix_tree_insert (tree, key, -1, NULL);
+          gw_radix_tree_insert (tree, key, -1, NULL);
         }
 
-      words_radix_tree_clear (tree);
+      gw_radix_tree_clear (tree);
 
       end = clock ();
       spent = (gdouble) (end - begin) / CLOCKS_PER_SEC;
@@ -123,13 +123,13 @@ iter_cb (const gchar *key,
 
   g_assert (g_strv_contains (entries, key));
 
-  return WORDS_RADIX_TREE_ITER_CONTINUE;
+  return GW_RADIX_TREE_ITER_CONTINUE;
 }
 
 static void
 radix_tree_iteration (void)
 {
-  WordsRadixTree *tree;
+  GwRadixTree *tree;
   gint i;
 
   const gchar* entries[] = {
@@ -142,12 +142,12 @@ radix_tree_iteration (void)
     NULL
   };
 
-  tree = words_radix_tree_new ();
+  tree = gw_radix_tree_new ();
 
   for (i = 0; entries[i]; i++)
-    words_radix_tree_insert (tree, entries[i], -1, NULL);
+    gw_radix_tree_insert (tree, entries[i], -1, NULL);
 
-  words_radix_tree_iter (tree, iter_cb, entries);
+  gw_radix_tree_iter (tree, iter_cb, entries);
 
   g_clear_object (&tree);
 }
@@ -164,13 +164,13 @@ utf8_iter_cb (const gchar *key,
 
   g_assert (g_strv_contains (entries, key));
 
-  return WORDS_RADIX_TREE_ITER_CONTINUE;
+  return GW_RADIX_TREE_ITER_CONTINUE;
 }
 
 static void
 radix_tree_utf8 (void)
 {
-  WordsRadixTree *tree;
+  GwRadixTree *tree;
   gint i;
 
   const gchar* entries[] = {
@@ -182,12 +182,12 @@ radix_tree_utf8 (void)
     NULL
   };
 
-  tree = words_radix_tree_new ();
+  tree = gw_radix_tree_new ();
 
   for (i = 0; entries[i]; i++)
-    words_radix_tree_insert (tree, entries[i], -1, NULL);
+    gw_radix_tree_insert (tree, entries[i], -1, NULL);
 
-  words_radix_tree_iter (tree, utf8_iter_cb, entries);
+  gw_radix_tree_iter (tree, utf8_iter_cb, entries);
 
   g_clear_object (&tree);
 }
@@ -197,7 +197,7 @@ radix_tree_utf8 (void)
 static void
 radix_tree_get_keys (void)
 {
-  WordsRadixTree *tree;
+  GwRadixTree *tree;
   GStrv keys;
   gint i;
 
@@ -209,12 +209,12 @@ radix_tree_get_keys (void)
     "В'єтнамська мова"
   };
 
-  tree = words_radix_tree_new ();
+  tree = gw_radix_tree_new ();
 
   for (i = 0; i < G_N_ELEMENTS (entries); i++)
-    words_radix_tree_insert (tree, entries[i], -1, GINT_TO_POINTER (i));
+    gw_radix_tree_insert (tree, entries[i], -1, GINT_TO_POINTER (i));
 
-  keys = words_radix_tree_get_keys (tree);
+  keys = gw_radix_tree_get_keys (tree);
 
   g_assert_nonnull (keys);
   g_assert_cmpuint (g_strv_length (keys), ==, G_N_ELEMENTS (entries));
@@ -229,7 +229,7 @@ static void
 radix_tree_get_values (void)
 {
   g_autoptr (GPtrArray) values;
-  WordsRadixTree *tree;
+  GwRadixTree *tree;
   gint i;
 
   const gchar* entries[] = {
@@ -240,12 +240,12 @@ radix_tree_get_values (void)
     "В'єтнамська мова"
   };
 
-  tree = words_radix_tree_new ();
+  tree = gw_radix_tree_new ();
 
   for (i = 0; i < G_N_ELEMENTS (entries); i++)
-    words_radix_tree_insert (tree, entries[i], -1, GINT_TO_POINTER (i));
+    gw_radix_tree_insert (tree, entries[i], -1, GINT_TO_POINTER (i));
 
-  values = words_radix_tree_get_values (tree);
+  values = gw_radix_tree_get_values (tree);
 
   g_assert_nonnull (values);
   g_assert_cmpuint (values->len, ==, G_N_ELEMENTS (entries));

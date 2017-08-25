@@ -1,4 +1,4 @@
-/* words-radix-tree.c
+/* gw-radix-tree.c
  *
  * Copyright (C) 2016 Georges Basile Stavracas Neto <georges.stavracas@gmail.com>
  *
@@ -16,23 +16,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "words-radix-tree.h"
+#include "gw-radix-tree.h"
 
 #include <emmintrin.h>
 #include <stdio.h>
 #include <string.h>
 
 /**
- * SECTION:words-radix-tree
+ * SECTION:gw-radix-tree
  * @short_title:adaptive radix tree designed for general usage
- * @title:WordsRadixTree
+ * @title:GwRadixTree
  * @stability:Stable
  *
- * #WordsRadixTree is an adaptive radix tree which performs very well memory- and
+ * #GwRadixTree is an adaptive radix tree which performs very well memory- and
  * performance-wise. It works as a database-like data structure, optimize for string
  * keys.
  *
- * #WordsRadixTree supports deleting keys with a destroy function, see words_radix_tree_new_with_free_func().
+ * #GwRadixTree supports deleting keys with a destroy function, see gw_radix_tree_new_with_free_func().
  * The free function is called on the data assigned to the key only if it's non-%NULL.
  */
 
@@ -122,9 +122,9 @@ typedef struct
   Node               *root;
   guint64             size;
   GDestroyNotify      destroy_func;
-} WordsRadixTreePrivate;
+} GwRadixTreePrivate;
 
-G_DEFINE_TYPE_WITH_PRIVATE (WordsRadixTree, words_radix_tree, G_TYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE (GwRadixTree, gw_radix_tree, G_TYPE_OBJECT)
 
 enum
 {
@@ -150,7 +150,7 @@ get_keys_cb (const gchar *key,
 
   g_ptr_array_add (results, g_strdup (key));
 
-  return WORDS_RADIX_TREE_ITER_CONTINUE;
+  return GW_RADIX_TREE_ITER_CONTINUE;
 }
 
 static inline gboolean
@@ -163,7 +163,7 @@ get_values_cb (const gchar *key,
 
   g_ptr_array_add (results, value);
 
-  return WORDS_RADIX_TREE_ITER_CONTINUE;
+  return GW_RADIX_TREE_ITER_CONTINUE;
 }
 
 
@@ -1112,7 +1112,7 @@ iter_recursive (Node        *n,
   gint res, i;
 
   if (!n)
-    return WORDS_RADIX_TREE_ITER_CONTINUE;
+    return GW_RADIX_TREE_ITER_CONTINUE;
 
   if (IS_LEAF (n))
     {
@@ -1176,28 +1176,28 @@ iter_recursive (Node        *n,
         g_assert_not_reached ();
     }
 
-  return WORDS_RADIX_TREE_ITER_CONTINUE;
+  return GW_RADIX_TREE_ITER_CONTINUE;
 }
 
 static void
-words_radix_tree_finalize (GObject *object)
+gw_radix_tree_finalize (GObject *object)
 {
-  WordsRadixTree *self = (WordsRadixTree *)object;
-  WordsRadixTreePrivate *priv = words_radix_tree_get_instance_private (self);
+  GwRadixTree *self = (GwRadixTree *)object;
+  GwRadixTreePrivate *priv = gw_radix_tree_get_instance_private (self);
 
   destroy_node_recursive (priv->root);
 
-  G_OBJECT_CLASS (words_radix_tree_parent_class)->finalize (object);
+  G_OBJECT_CLASS (gw_radix_tree_parent_class)->finalize (object);
 }
 
 static void
-words_radix_tree_get_property (GObject    *object,
-                               guint       prop_id,
-                               GValue     *value,
-                               GParamSpec *pspec)
+gw_radix_tree_get_property (GObject    *object,
+                            guint       prop_id,
+                            GValue     *value,
+                            GParamSpec *pspec)
 {
-  WordsRadixTree *self = WORDS_RADIX_TREE (object);
-  WordsRadixTreePrivate *priv = words_radix_tree_get_instance_private (self);
+  GwRadixTree *self = GW_RADIX_TREE (object);
+  GwRadixTreePrivate *priv = gw_radix_tree_get_instance_private (self);
 
   switch (prop_id)
     {
@@ -1211,25 +1211,25 @@ words_radix_tree_get_property (GObject    *object,
 }
 
 static void
-words_radix_tree_set_property (GObject      *object,
-                               guint         prop_id,
-                               const GValue *value,
-                               GParamSpec   *pspec)
+gw_radix_tree_set_property (GObject      *object,
+                            guint         prop_id,
+                            const GValue *value,
+                            GParamSpec   *pspec)
 {
   G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
 }
 
 static void
-words_radix_tree_class_init (WordsRadixTreeClass *klass)
+gw_radix_tree_class_init (GwRadixTreeClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  object_class->finalize = words_radix_tree_finalize;
-  object_class->get_property = words_radix_tree_get_property;
-  object_class->set_property = words_radix_tree_set_property;
+  object_class->finalize = gw_radix_tree_finalize;
+  object_class->get_property = gw_radix_tree_get_property;
+  object_class->set_property = gw_radix_tree_set_property;
 
   /**
-   * WordsRadixTree:size:
+   * GwRadixTree:size:
    *
    * The number of elements this tree contains.
    *
@@ -1247,51 +1247,51 @@ words_radix_tree_class_init (WordsRadixTreeClass *klass)
 }
 
 static void
-words_radix_tree_init (WordsRadixTree *self)
+gw_radix_tree_init (GwRadixTree *self)
 {
 }
 
 /**
- * words_radix_tree_new:
+ * gw_radix_tree_new:
  *
- * Creates a new #WordsRadixTree.
+ * Creates a new #GwRadixTree.
  *
- * Returns: (transfer full): a new #WordsRadixTree.
+ * Returns: (transfer full): a new #GwRadixTree.
  *
  * Since: 0.1.0
  */
-WordsRadixTree *
-words_radix_tree_new (void)
+GwRadixTree *
+gw_radix_tree_new (void)
 {
-  return g_object_new (WORDS_TYPE_RADIX_TREE, NULL);
+  return g_object_new (GW_TYPE_RADIX_TREE, NULL);
 }
 
 /**
- * words_radix_tree_new_with_free_func:
+ * gw_radix_tree_new_with_free_func:
  * @destroy_func: (nullable): A function to free the data elements, or %NULL.
  *
- * Creates a new #WordsRadixTree with @destroy_func.
+ * Creates a new #GwRadixTree with @destroy_func.
  *
- * Returns: (transfer full): a new #WordsRadixTree.
+ * Returns: (transfer full): a new #GwRadixTree.
  *
  * Since: 0.1.0
  */
-WordsRadixTree*
-words_radix_tree_new_with_free_func (GDestroyNotify destroy_func)
+GwRadixTree*
+gw_radix_tree_new_with_free_func (GDestroyNotify destroy_func)
 {
-  WordsRadixTreePrivate *priv;
-  WordsRadixTree *tree;
+  GwRadixTreePrivate *priv;
+  GwRadixTree *tree;
 
-  tree = words_radix_tree_new ();
-  priv = words_radix_tree_get_instance_private (tree);
+  tree = gw_radix_tree_new ();
+  priv = gw_radix_tree_get_instance_private (tree);
   priv->destroy_func = destroy_func;
 
   return tree;
 }
 
 /**
- * words_radix_tree_contains:
- * @self: a #WordsRadixTree
+ * gw_radix_tree_contains:
+ * @self: a #GwRadixTree
  * @key: the key to search for.
  * @key_length: the length of @key, or -1
  *
@@ -1302,22 +1302,22 @@ words_radix_tree_new_with_free_func (GDestroyNotify destroy_func)
  * Since: 0.1.0
  */
 gboolean
-words_radix_tree_contains (WordsRadixTree *self,
-                           const gchar    *key,
-                           gsize           key_length)
+gw_radix_tree_contains (GwRadixTree *self,
+                        const gchar *key,
+                        gsize        key_length)
 {
   gboolean found;
 
-  g_return_val_if_fail (WORDS_IS_RADIX_TREE (self), FALSE);
+  g_return_val_if_fail (GW_IS_RADIX_TREE (self), FALSE);
 
-  words_radix_tree_lookup (self, key, key_length, &found);
+  gw_radix_tree_lookup (self, key, key_length, &found);
 
   return found;
 }
 
 /**
- * words_radix_tree_lookup:
- * @tree: a #WordsRadixTree
+ * gw_radix_tree_lookup:
+ * @tree: a #GwRadixTree
  * @key: the key to look for
  * @key_length: the length of @key, or -1
  * @found: whether the value was found or not
@@ -1331,19 +1331,19 @@ words_radix_tree_contains (WordsRadixTree *self,
  * Since: 0.1.0
  */
 gpointer
-words_radix_tree_lookup (WordsRadixTree *self,
-                         const gchar    *key,
-                         gsize           key_length,
-                         gboolean       *found)
+gw_radix_tree_lookup (GwRadixTree *self,
+                      const gchar *key,
+                      gsize        key_length,
+                      gboolean    *found)
 {
-  WordsRadixTreePrivate *priv;
+  GwRadixTreePrivate *priv;
   Node **child;
   Node *n;
   gint depth;
 
-  g_return_val_if_fail (WORDS_IS_RADIX_TREE (self), NULL);
+  g_return_val_if_fail (GW_IS_RADIX_TREE (self), NULL);
 
-  priv = words_radix_tree_get_instance_private (self);
+  priv = gw_radix_tree_get_instance_private (self);
   n = priv->root;
   depth = 0;
 
@@ -1385,8 +1385,8 @@ words_radix_tree_lookup (WordsRadixTree *self,
 }
 
 /**
- * words_radix_tree_insert:
- * @tree: the #WordsRadixTree to add to
+ * gw_radix_tree_insert:
+ * @tree: the #GwRadixTree to add to
  * @key: string user as identifier of the value. Must be a UTF-8 valid string.
  * @key_length: the length of @key, or -1
  * @value: (nullable): user data to be stored. Can be %NULL.
@@ -1399,18 +1399,18 @@ words_radix_tree_lookup (WordsRadixTree *self,
  * Since: 0.1.0
  */
 gboolean
-words_radix_tree_insert (WordsRadixTree *self,
-                         const gchar    *key,
-                         gsize           key_length,
-                         gpointer        value)
+gw_radix_tree_insert (GwRadixTree *self,
+                      const gchar *key,
+                      gsize        key_length,
+                      gpointer     value)
 {
-  WordsRadixTreePrivate *priv;
+  GwRadixTreePrivate *priv;
   gpointer old_val;
   gboolean old;
 
-  g_return_val_if_fail (WORDS_IS_RADIX_TREE (self), FALSE);
+  g_return_val_if_fail (GW_IS_RADIX_TREE (self), FALSE);
 
-  priv = words_radix_tree_get_instance_private (self);
+  priv = gw_radix_tree_get_instance_private (self);
   old = FALSE;
 
   old_val = insert_recursive (priv->root,
@@ -1428,8 +1428,8 @@ words_radix_tree_insert (WordsRadixTree *self,
 }
 
 /**
- * words_radix_tree_get_keys:
- * @tree: a #WordsRadixTree
+ * gw_radix_tree_get_keys:
+ * @tree: a #GwRadixTree
  *
  * Retrieve all keys from the tree
  *
@@ -1438,15 +1438,15 @@ words_radix_tree_insert (WordsRadixTree *self,
  * Since: 0.1.0
  */
 GStrv
-words_radix_tree_get_keys (WordsRadixTree *self)
+gw_radix_tree_get_keys (GwRadixTree *self)
 {
   GPtrArray *result;
 
-  g_return_val_if_fail (WORDS_IS_RADIX_TREE (self), NULL);
+  g_return_val_if_fail (GW_IS_RADIX_TREE (self), NULL);
 
   result = g_ptr_array_new ();
 
-  words_radix_tree_iter (self, get_keys_cb, result);
+  gw_radix_tree_iter (self, get_keys_cb, result);
 
   /* Tail NULL */
   g_ptr_array_add (result, NULL);
@@ -1455,8 +1455,8 @@ words_radix_tree_get_keys (WordsRadixTree *self)
 }
 
 /**
- * words_radix_tree_get_values:
- * @tree: a #WordsRadixTree
+ * gw_radix_tree_get_values:
+ * @tree: a #GwRadixTree
  *
  * Retrieve all values from the tree
  *
@@ -1465,22 +1465,22 @@ words_radix_tree_get_keys (WordsRadixTree *self)
  * Since: 0.1.0
  */
 GPtrArray*
-words_radix_tree_get_values (WordsRadixTree *self)
+gw_radix_tree_get_values (GwRadixTree *self)
 {
   GPtrArray *result;
 
-  g_return_val_if_fail (WORDS_IS_RADIX_TREE (self), NULL);
+  g_return_val_if_fail (GW_IS_RADIX_TREE (self), NULL);
 
   result = g_ptr_array_new ();
 
-  words_radix_tree_iter (self, get_values_cb, result);
+  gw_radix_tree_iter (self, get_values_cb, result);
 
   return result;
 }
 
 /**
- * words_radix_tree_iter:
- * @tree: the #WordsRadixTree to be traversed
+ * gw_radix_tree_iter:
+ * @tree: the #GwRadixTree to be traversed
  * @callback: user-defined function to call on each value
  * @user_data:
  *
@@ -1493,22 +1493,22 @@ words_radix_tree_get_values (WordsRadixTree *self)
  * Since: 0.1.0
  */
 gboolean
-words_radix_tree_iter (WordsRadixTree *self,
-                       RadixTreeCb     callback,
-                       gpointer        user_data)
+gw_radix_tree_iter (GwRadixTree *self,
+                    RadixTreeCb  callback,
+                    gpointer     user_data)
 {
-  WordsRadixTreePrivate *priv;
+  GwRadixTreePrivate *priv;
 
-  g_return_val_if_fail (WORDS_IS_RADIX_TREE (self), FALSE);
+  g_return_val_if_fail (GW_IS_RADIX_TREE (self), FALSE);
 
-  priv = words_radix_tree_get_instance_private (self);
+  priv = gw_radix_tree_get_instance_private (self);
 
   return iter_recursive (priv->root, callback, user_data);
 }
 
 /**
- * words_radix_tree_remove:
- * @tree: the #WordsRadixTree
+ * gw_radix_tree_remove:
+ * @tree: the #GwRadixTree
  * @key: the key to be removed. Must be UTF-8 valid.
  * @key_length: the length of @key, or -1
  *
@@ -1518,16 +1518,16 @@ words_radix_tree_iter (WordsRadixTree *self,
  * Since: 0.1.0
  */
 void
-words_radix_tree_remove (WordsRadixTree *self,
-                         const gchar    *key,
-                         gsize           key_length)
+gw_radix_tree_remove (GwRadixTree *self,
+                      const gchar *key,
+                      gsize        key_length)
 {
-  WordsRadixTreePrivate *priv;
+  GwRadixTreePrivate *priv;
   Leaf *removed;
 
-  g_return_if_fail (WORDS_IS_RADIX_TREE (self));
+  g_return_if_fail (GW_IS_RADIX_TREE (self));
 
-  priv = words_radix_tree_get_instance_private (self);
+  priv = gw_radix_tree_get_instance_private (self);
   removed = remove_recursive (priv->root,
                               &priv->root,
                               (guchar*) key,
@@ -1546,8 +1546,8 @@ words_radix_tree_remove (WordsRadixTree *self,
 }
 
 /**
- * words_radix_tree_steal:
- * @tree: the #WordsRadixTree
+ * gw_radix_tree_steal:
+ * @tree: the #GwRadixTree
  * @key: the key to be removed. Must be UTF-8 valid.
  * @key_length: the length of @key, or -1
  *
@@ -1557,16 +1557,16 @@ words_radix_tree_remove (WordsRadixTree *self,
  * Since: 0.1.0
  */
 void
-words_radix_tree_steal (WordsRadixTree *self,
-                        const gchar    *key,
-                        gsize           key_length)
+gw_radix_tree_steal (GwRadixTree *self,
+                     const gchar *key,
+                     gsize        key_length)
 {
-  WordsRadixTreePrivate *priv;
+  GwRadixTreePrivate *priv;
   Leaf *removed;
 
-  g_return_if_fail (WORDS_IS_RADIX_TREE (self));
+  g_return_if_fail (GW_IS_RADIX_TREE (self));
 
-  priv = words_radix_tree_get_instance_private (self);
+  priv = gw_radix_tree_get_instance_private (self);
   removed = remove_recursive (priv->root,
                               &priv->root,
                               (guchar*) key,
@@ -1581,21 +1581,21 @@ words_radix_tree_steal (WordsRadixTree *self,
 }
 
 /**
- * words_radix_tree_clear:
- * @self: the #WordsRadixTree to be cleared.
+ * gw_radix_tree_clear:
+ * @self: the #GwRadixTree to be cleared.
  *
  * Clear out the nodes from the tree.
  *
  * Since: 0.1.0
  */
 void
-words_radix_tree_clear (WordsRadixTree *self)
+gw_radix_tree_clear (GwRadixTree *self)
 {
-  WordsRadixTreePrivate *priv;
+  GwRadixTreePrivate *priv;
 
-  g_return_if_fail (WORDS_IS_RADIX_TREE (self));
+  g_return_if_fail (GW_IS_RADIX_TREE (self));
 
-  priv = words_radix_tree_get_instance_private (self);
+  priv = gw_radix_tree_get_instance_private (self);
 
   destroy_node_recursive (priv->root);
   priv->root = NULL;
@@ -1603,8 +1603,8 @@ words_radix_tree_clear (WordsRadixTree *self)
 }
 
 /**
- * words_radix_tree_get_size:
- * @self: the #WordsRadixTree to count.
+ * gw_radix_tree_get_size:
+ * @self: the #GwRadixTree to count.
  *
  * Retrieves the number of elements of @tree.
  *
@@ -1613,13 +1613,13 @@ words_radix_tree_clear (WordsRadixTree *self)
  * Since: 0.1.0
  */
 gint
-words_radix_tree_get_size (WordsRadixTree *self)
+gw_radix_tree_get_size (GwRadixTree *self)
 {
-  WordsRadixTreePrivate *priv;
+  GwRadixTreePrivate *priv;
 
-  g_return_val_if_fail (WORDS_IS_RADIX_TREE (self), -1);
+  g_return_val_if_fail (GW_IS_RADIX_TREE (self), -1);
 
-  priv = words_radix_tree_get_instance_private (self);
+  priv = gw_radix_tree_get_instance_private (self);
 
   return priv->size;
 }
