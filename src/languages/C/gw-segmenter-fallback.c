@@ -20,11 +20,14 @@
 
 #include "gw-segmenter-fallback.h"
 
+#include <string.h>
+
 struct _GwSegmenterFallback
 {
   GObject             parent;
 
   GwString           *text;
+  GPtrArray          *words;
 };
 
 static void          gw_segmenter_segmenter_iface_init           (GwSegmenterInterface *iface);
@@ -59,7 +62,9 @@ gw_segmenter_fallback_set_text (GwSegmenter *segmenter,
   self = GW_SEGMENTER_FALLBACK (segmenter);
 
   g_clear_pointer (&self->text, gw_string_unref);
-  self->text = gw_string_ref (text);
+  self->text = text ? gw_string_ref (text) : NULL;
+
+  g_ptr_array_remove_range (self->words, 0, self->words->len);
 }
 
 static gboolean
@@ -67,8 +72,75 @@ gw_segmenter_fallback_segment (GwSegmenter   *segmenter,
                                GCancellable  *cancellable,
                                GError       **error)
 {
-  /* TODO: implement gw_segmenter_fallback_segment */
+  GwSegmenterFallback *self;
+  gboolean was_word, is_word;
+  gchar *aux, *start, *end;
+
   g_return_val_if_fail (GW_IS_SEGMENTER_FALLBACK (segmenter), FALSE);
+
+  self = GW_SEGMENTER_FALLBACK (segmenter);
+  is_word = was_word = FALSE;
+  start = end = NULL;
+
+  /* Always cleanup */
+  g_ptr_array_remove_range (self->words, 0, self->words->len);
+
+  /* Don't attempt to segment NULL texts */
+  if (!self->text)
+    goto out;
+
+  aux = self->text;
+
+  /*
+   * The fallback segmenter is pretty stupid, but it's the best we
+   * can do without language-specific knowledge. It iterates through
+   * the string and checks for 2 relevant cases, for example:
+   *
+   * A       B
+   * ↓       ↓
+   * I should break in six words.
+   *
+   * In (B), we reached the end of the word. In (A), we just entered
+   * the word. Thus, (A) is the start and (B) is the end of the segment.
+   */
+  do
+    {
+      gunichar c;
+
+      c = g_utf8_get_char (aux);
+
+      was_word = is_word;
+
+      if (g_unichar_ispunct (c) || g_unichar_isspace (c))
+        is_word = FALSE;
+      else
+        is_word = TRUE;
+
+      if (!was_word && is_word)
+        {
+          start = aux;
+        }
+      else if (was_word && !is_word)
+        {
+          gsize length;
+          gchar *substring;
+
+          end = aux;
+          length = end - start;
+          substring = g_malloc (length + 1);
+
+          memcpy (substring, start, length);
+          substring[length] = '\0';
+
+          g_ptr_array_add (self->words, substring);
+        }
+
+      aux = g_utf8_next_char (aux);
+    }
+  while (aux && *aux);
+
+out:
+  g_ptr_array_add (self->words, NULL);
 
   return TRUE;
 }
@@ -76,10 +148,13 @@ gw_segmenter_fallback_segment (GwSegmenter   *segmenter,
 static GStrv
 gw_segmenter_fallback_get_words (GwSegmenter *segmenter)
 {
-  /* TODO: implement gw_segmenter_fallback_get_words */
+  GwSegmenterFallback *self;
+
   g_return_val_if_fail (GW_IS_SEGMENTER_FALLBACK (segmenter), NULL);
 
-  return NULL;
+  self = GW_SEGMENTER_FALLBACK (segmenter);
+
+  return (GStrv) self->words->pdata;
 }
 
 static void
@@ -95,17 +170,12 @@ gw_segmenter_segmenter_iface_init (GwSegmenterInterface *iface)
  * GObject overrides
  */
 
-GwSegmenterFallback *
-gw_segmenter_fallback_new (void)
-{
-  return g_object_new (GW_TYPE_SEGMENTER_FALLBACK, NULL);
-}
-
 static void
 gw_segmenter_fallback_finalize (GObject *object)
 {
   GwSegmenterFallback *self = (GwSegmenterFallback *)object;
 
+  g_clear_pointer (&self->words, g_ptr_array_unref);
   g_clear_pointer (&self->text, gw_string_unref);
 
   G_OBJECT_CLASS (gw_segmenter_fallback_parent_class)->finalize (object);
@@ -142,4 +212,5 @@ gw_segmenter_fallback_class_init (GwSegmenterFallbackClass *klass)
 static void
 gw_segmenter_fallback_init (GwSegmenterFallback *self)
 {
+  self->words = g_ptr_array_new_with_free_func (g_free);
 }
