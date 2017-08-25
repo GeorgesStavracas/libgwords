@@ -9,6 +9,7 @@ word_headers = [
   'words.h',
   'words-dictionary.h',
   'words-group.h',
+  'words-language.h',
   'words-radix-tree.h',
   'words-segmenter.h',
 ]
@@ -16,6 +17,7 @@ word_headers = [
 word_sources = files(
   'words-dictionary.c',
   'words-group.c',
+  'words-language.c',
   'words-radix-tree.c',
   'words-segmenter.c',
 )
