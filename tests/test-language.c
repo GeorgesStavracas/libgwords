@@ -44,6 +44,65 @@ language_loaded_cb (GObject      *source_object,
 }
 
 static void
+get_language_async (void)
+{
+  GMainLoop *mainloop;
+
+  mainloop = g_main_loop_new (NULL, FALSE);
+
+  gw_language_new ("en_GB",
+                   NULL,
+                   language_loaded_cb,
+                   mainloop);
+
+  g_main_loop_run (mainloop);
+}
+
+
+/**************************************************************************************************/
+
+static void
+get_language (void)
+{
+  GwLanguage *language;
+  GError *error;
+
+  error = NULL;
+  language = gw_language_new_sync ("en_GB", NULL, &error);
+
+  g_assert_nonnull (language);
+  g_assert (!error);
+
+  g_clear_object (&language);
+}
+
+
+/**************************************************************************************************/
+
+static void
+system_language_loaded_cb (GObject      *source_object,
+                           GAsyncResult *res,
+                           gpointer      user_data)
+{
+  GwLanguage *language;
+  GMainLoop *mainloop;
+  GError *error;
+
+  error = NULL;
+  mainloop = user_data;
+  language = gw_language_new_finish (res, &error);
+
+  g_message ("Language: %s", gw_language_get_language_code (language));
+
+  g_assert_nonnull (language);
+  g_assert (!error);
+
+  g_main_loop_quit (mainloop);
+
+  g_clear_object (&language);
+}
+
+static void
 get_system_language_async (void)
 {
   GMainLoop *mainloop;
@@ -52,7 +111,7 @@ get_system_language_async (void)
 
   gw_language_new (NULL,
                    NULL,
-                   language_loaded_cb,
+                   system_language_loaded_cb,
                    mainloop);
 
   g_main_loop_run (mainloop);
@@ -87,6 +146,8 @@ main (gint   argc,
 
   gw_init ();
 
+  g_test_add_func ("/language/get_language", get_language);
+  g_test_add_func ("/language/get_language_async", get_language_async);
   g_test_add_func ("/language/get_system_language", get_system_language);
   g_test_add_func ("/language/get_system_language_async", get_system_language_async);
 
