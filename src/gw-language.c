@@ -19,6 +19,7 @@
 
 #include "gw-language.h"
 #include "gw-radix-tree.h"
+#include "gw-utils.h"
 
 struct _GwLanguage
 {
@@ -131,6 +132,19 @@ gw_language_set_property (GObject      *object,
     {
     case PROP_CODE:
       self->code = g_value_dup_string (value);
+
+      /* Default to the system language if nothing was provided */
+      if (!self->code)
+        {
+          g_autofree gchar *region = NULL;
+          g_autofree gchar *lang = NULL;
+
+          if (!gw_get_system_language (&lang, &region))
+            break;
+
+          self->code = g_strdup_printf ("%s_%s", lang, region);
+        }
+
       break;
 
     default:
@@ -173,7 +187,7 @@ gw_language_error_quark (void)
 
 /**
  * gw_language_new:
- * @language: the language code
+ * @language: (nullable): the language code
  * @cancellable: (nullable): optional #GCancellable object
  * @callback: (scope async): a #GAsyncReadyCallback to call when the initialization is done
  * @user_data: (closure): data to pass to the callback function
@@ -229,7 +243,7 @@ gw_language_new_finish (GAsyncResult  *result,
 
 /**
  * gw_language_new_sync:
- * @language: the language string.
+ * @language: (nullable): the language string.
  * @cancellable: (nullable): a #GCancellable to cancel the operation
  * @error: (nullable): return value for a #GError
  *
