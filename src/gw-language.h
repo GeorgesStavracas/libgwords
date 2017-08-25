@@ -36,7 +36,7 @@ typedef enum
   GW_LANGUAGE_ERROR_INVALID,
 } GwLanguageError;
 
-#define WODS_LANGUAGE_ERROR (gw_language_error_quark ())
+#define GW_LANGUAGE_ERROR (gw_language_error_quark ())
 
 #define GW_TYPE_LANGUAGE (gw_language_get_type())
 
@@ -55,6 +55,8 @@ GwLanguage*          gw_language_new_finish                      (GAsyncResult  
 GwLanguage*          gw_language_new_sync                        (const gchar        *language,
                                                                   GCancellable       *cancellable,
                                                                   GError            **error);
+
+const gchar*         gw_language_get_language_code               (GwLanguage         *self);
 
 G_END_DECLS
 

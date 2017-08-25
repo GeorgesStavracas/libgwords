@@ -271,3 +271,21 @@ gw_language_new_sync (const gchar   *language_code,
                          "code", language_code,
                          NULL);
 }
+
+/**
+ * gw_language_get_language_code:
+ * @self: a #GwLanguage
+ *
+ * Retrieves the language code of @self.
+ *
+ * Returns: (transfer none): the language code
+ *
+ * Since: 0.1.0
+ */
+const gchar*
+gw_language_get_language_code (GwLanguage *self)
+{
+  g_return_val_if_fail (GW_IS_LANGUAGE (self), NULL);
+
+  return self->code;
+}
