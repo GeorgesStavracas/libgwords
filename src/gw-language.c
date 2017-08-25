@@ -343,5 +343,5 @@ gw_language_get_segmenter (GwLanguage *self)
 {
   g_return_val_if_fail (GW_IS_LANGUAGE (self), NULL);
 
-  return NULL;
+  return self->segmenter;
 }
