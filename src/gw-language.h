@@ -19,6 +19,8 @@
 #ifndef GW_LANGUAGE_H
 #define GW_LANGUAGE_H
 
+#include "gw-types.h"
+
 #include <gio/gio.h>
 #include <glib.h>
 #include <glib-object.h>
@@ -57,6 +59,8 @@ GwLanguage*          gw_language_new_sync                        (const gchar   
                                                                   GError            **error);
 
 const gchar*         gw_language_get_language_code               (GwLanguage         *self);
+
+GwSegmenter*         gw_language_get_segmenter                   (GwLanguage         *self);
 
 G_END_DECLS
 

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
+#include "gw-init.h"
 #include "gw-language.h"
 #include "gw-radix-tree.h"
 #include "gw-utils.h"
@@ -26,6 +26,8 @@ struct _GwLanguage
   GObject             parent;
 
   gchar              *code;
+
+  GwSegmenter        *segmenter;
 
   GError             *init_error;
   gboolean            valid : 1;
@@ -46,6 +48,49 @@ enum
 
 static GParamSpec *properties [N_PROPS] = { NULL, };
 
+
+/*
+ * Auxiliary methods
+ */
+static void
+gw_language_set_language_code_internal (GwLanguage  *self,
+                                        const gchar *code)
+{
+  GIOExtensionPoint *extension_point;
+  GIOExtension *segmenter_extension;
+
+  /* Default to the system language if nothing was provided */
+  if (!code)
+    {
+      g_autofree gchar *region = NULL;
+      g_autofree gchar *lang = NULL;
+
+      if (!gw_get_system_language (&lang, &region))
+        {
+          self->init_error = g_error_new (GW_LANGUAGE_ERROR,
+                                          GW_LANGUAGE_ERROR_INVALID,
+                                          "Couldn't fetch system language");
+          return;
+        }
+
+      self->code = g_strdup_printf ("%s_%s", lang, region);
+    }
+  else
+    {
+      self->code = g_strdup (code);
+    }
+
+  self->valid = TRUE;
+
+  /* Segmenter */
+  extension_point = g_io_extension_point_lookup (GW_EXTENSION_POINT_SEGMENTER);
+  segmenter_extension = g_io_extension_point_get_extension_by_name (extension_point, self->code);
+
+  if (!segmenter_extension)
+    segmenter_extension = g_io_extension_point_get_extension_by_name (extension_point, "fallback");
+
+  self->segmenter = g_object_new (g_io_extension_get_type (segmenter_extension), NULL);
+}
 
 /*
  * GInitable iface implementation
@@ -131,26 +176,7 @@ gw_language_set_property (GObject      *object,
   switch (prop_id)
     {
     case PROP_CODE:
-      self->code = g_value_dup_string (value);
-
-      /* Default to the system language if nothing was provided */
-      if (!self->code)
-        {
-          g_autofree gchar *region = NULL;
-          g_autofree gchar *lang = NULL;
-
-          if (!gw_get_system_language (&lang, &region))
-            {
-              self->init_error = g_error_new (GW_LANGUAGE_ERROR,
-                                              GW_LANGUAGE_ERROR_INVALID,
-                                              "Couldn't fetch system language");
-              break;
-            }
-
-          self->code = g_strdup_printf ("%s_%s", lang, region);
-        }
-
-      self->valid = TRUE;
+      gw_language_set_language_code_internal (self, g_value_get_string (value));
       break;
 
     default:
@@ -288,4 +314,23 @@ gw_language_get_language_code (GwLanguage *self)
   g_return_val_if_fail (GW_IS_LANGUAGE (self), NULL);
 
   return self->code;
+}
+
+/**
+ * gw_language_get_segmenter:
+ * @self: a #GwLanguage
+ *
+ * Retrieves the segmenter registered for this language, or
+ * the fallback segmenter if @language has no segmenter registered.
+ *
+ * Returns: (transfer none): a #GwSegmenter
+ *
+ * Since: 0.1.00000
+ */
+GwSegmenter*
+gw_language_get_segmenter (GwLanguage *self)
+{
+  g_return_val_if_fail (GW_IS_LANGUAGE (self), NULL);
+
+  return NULL;
 }

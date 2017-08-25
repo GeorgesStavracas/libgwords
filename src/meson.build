@@ -6,6 +6,7 @@ deps = [
 ]
 
 libgwords_headers = [
+  'languages/C/gw-segmenter-fallback.h',
   'gwords.h',
   'gw-dictionary.h',
   'gw-group.h',
@@ -19,6 +20,7 @@ libgwords_headers = [
 ]
 
 libgwords_sources = files(
+  'languages/C/gw-segmenter-fallback.c',
   'gw-dictionary.c',
   'gw-group.c',
   'gw-init.c',

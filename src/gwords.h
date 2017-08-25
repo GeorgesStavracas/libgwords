@@ -29,6 +29,7 @@ G_BEGIN_DECLS
 # include "gw-init.h"
 # include "gw-language.h"
 # include "gw-radix-tree.h"
+# include "gw-segmenter.h"
 # include "gw-string.h"
 # include "gw-utils.h"
 # include "gw-version.h"
