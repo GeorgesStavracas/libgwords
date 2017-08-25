@@ -35,6 +35,19 @@ test_dictionary = executable(
 test('test-dictionary', test_dictionary)
 
 
+############
+# Language #
+############
+
+test_language = executable(
+  'test-language',
+  'test-language.c',
+  dependencies: libgwords_dep,
+)
+
+test('test-language', test_language)
+
+
 ##############
 # Radix tree #
 ##############
