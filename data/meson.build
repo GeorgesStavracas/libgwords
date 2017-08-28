@@ -3,6 +3,7 @@
 #################
 
 gw_langs = [
+  'words/en_US.gwdict',
   'words/pt_BR.gwdict'
 ]
 
