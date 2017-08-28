@@ -165,6 +165,10 @@ gw_language_get_property (GObject    *object,
       g_value_set_string (value, self->code);
       break;
 
+    case PROP_SEGMENTER:
+      g_value_set_object (value, self->segmenter);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
