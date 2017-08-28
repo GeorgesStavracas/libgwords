@@ -60,6 +60,47 @@ fallback (void)
 
 /**************************************************************************************************/
 
+static void
+pt_BR (void)
+{
+  g_autoptr (GwSegmenter) segmenter;
+  g_autoptr (GwString) str;
+  GwLanguage *language;
+  GStrv words;
+  gboolean success;
+
+  str = gw_string_new_static ("Oi, eu sou o Goku! E essas frases devem ser quebradas corretamente - por exemplo,\n"
+                              "mesmo que eu adicione novas linhas e hífens, ainda deve funcionar!");
+  language = gw_language_new_sync ("pt_BR", NULL, NULL);
+
+  /* Setup the segmenter */
+  segmenter = gw_language_get_segmenter (language);
+
+  g_assert_nonnull (segmenter);
+  g_assert_cmpstr (g_type_name (G_OBJECT_TYPE (segmenter)), ==, "GwSegmenterPtBr");
+
+  gw_segmenter_set_text (segmenter, str);
+  g_assert (gw_segmenter_get_text (segmenter) == str);
+
+  success = gw_segmenter_segment_sync (segmenter, NULL, NULL);
+  g_assert_true (success);
+
+  words = gw_segmenter_get_words (segmenter);
+  g_assert_cmpuint (g_strv_length (words), ==, 25);
+
+  /* NULL string */
+  gw_segmenter_set_text (segmenter, NULL);
+  g_assert_null (gw_segmenter_get_text (segmenter));
+
+  success = gw_segmenter_segment_sync (segmenter, NULL, NULL);
+  g_assert_true (success);
+
+  words = gw_segmenter_get_words (segmenter);
+  g_assert_cmpuint (g_strv_length (words), ==, 0);
+}
+
+/**************************************************************************************************/
+
 gint
 main (gint   argc,
       gchar *argv[])
@@ -69,6 +110,8 @@ main (gint   argc,
   gw_init ();
 
   g_test_add_func ("/segmenters/fallback", fallback);
+
+  g_test_add_func ("/segmenters/pt_BR", pt_BR);
 
   return g_test_run ();
 }
