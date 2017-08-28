@@ -37,6 +37,21 @@ string_init (void)
 
 /**************************************************************************************************/
 
+static void
+static_string_init (void)
+{
+  GwString *string;
+
+  string = gw_string_new_static ("this is a static string");
+
+  gw_string_ref (string);
+
+  gw_string_unref (string);
+  gw_string_unref (string);
+}
+
+/**************************************************************************************************/
+
 gint
 main (gint   argc,
       gchar *argv[])
@@ -46,6 +61,7 @@ main (gint   argc,
   gw_init ();
 
   g_test_add_func ("/string/init", string_init);
+  g_test_add_func ("/string/static_init", static_string_init);
 
   return g_test_run ();
 }
