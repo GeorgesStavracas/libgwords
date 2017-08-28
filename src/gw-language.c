@@ -104,8 +104,8 @@ G_LOCK_DEFINE_STATIC (init_lock);
 
 static gboolean
 gw_language_initable_init (GInitable     *initable,
-                              GCancellable  *cancellable,
-                              GError       **error)
+                           GCancellable  *cancellable,
+                           GError       **error)
 {
   GwLanguage *self = GW_LANGUAGE (initable);
 
@@ -336,7 +336,7 @@ gw_language_get_language_code (GwLanguage *self)
  *
  * Returns: (transfer none): a #GwSegmenter
  *
- * Since: 0.1.00000
+ * Since: 0.1.0
  */
 GwSegmenter*
 gw_language_get_segmenter (GwLanguage *self)
