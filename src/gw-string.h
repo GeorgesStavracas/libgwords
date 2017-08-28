@@ -36,9 +36,9 @@ typedef gchar GwString;
  * The debug type flags.
  **/
 typedef enum {
-  GW_STRING_DEBUG_NONE  = 0,    /* Since: 0.6.16 */
-  GW_STRING_DEBUG_DEDUPED  = 1 << 0,  /* Since: 0.6.16 */
-  GW_STRING_DEBUG_DUPES  = 1 << 1,  /* Since: 0.6.16 */
+  GW_STRING_DEBUG_NONE     = 0,
+  GW_STRING_DEBUG_DEDUPED  = 1 << 0,
+  GW_STRING_DEBUG_DUPES    = 1 << 1,
   /*< private >*/
   GW_STRING_DEBUG_LAST
 } GwStringDebugFlags;
