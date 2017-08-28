@@ -212,6 +212,21 @@ dictionary_load_file_error_async (void)
   g_main_loop_run (mainloop);
 }
 
+/*****************************************************************************/
+
+static void
+dict_pt_br (void)
+{
+  g_autoptr (GwLanguage) language;
+  GwDictionary *dict;
+
+  language = gw_language_new_sync ("pt_BR", NULL, NULL);
+
+  dict = gw_language_get_dictionary (language);
+  g_assert_nonnull (dict);
+}
+
+/*****************************************************************************/
 
 gint
 main (gint   argc,
@@ -228,6 +243,7 @@ main (gint   argc,
   g_test_add_func ("/dictionary/load_file_error", dictionary_load_file_error);
   g_test_add_func ("/dictionary/load_file_ok_async", dictionary_load_file_ok_async);
   g_test_add_func ("/dictionary/load_file_error_async", dictionary_load_file_error_async);
+  g_test_add_func ("/dictionary/lang/pt_BR", dict_pt_br);
 
   return g_test_run ();
 }
