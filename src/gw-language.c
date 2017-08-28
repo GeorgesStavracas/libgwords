@@ -66,6 +66,7 @@ load_dictionary_file_at_path (GwLanguage  *self,
   g_autofree gchar *dict_file;
   g_autofree gchar *filepath;
 
+  /* TODO: if fail to find lang_REGION.gwdict, try only lang.gwdict */
   error = NULL;
   dict_file = g_strdup_printf ("%s.gwdict", self->code);
   filepath = g_build_filename (path, dict_file, NULL);
