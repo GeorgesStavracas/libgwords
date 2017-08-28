@@ -1,8 +1,5 @@
-gw_datadir = join_paths(gw_prefix, get_option('datadir'), 'gwords')
-
-
 #################
-# words/* files #
+# .gwdict files #
 #################
 
 gw_langs = [

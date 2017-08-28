@@ -21,6 +21,8 @@ gw_micro_version = varr[2]
 gw_prefix = get_option('prefix')
 gw_libdir = get_option('libdir')
 gw_libdir_abs = join_paths(gw_prefix, gw_libdir)
+gw_datadir = join_paths(get_option('datadir'), 'gwords')
+gw_datadir_abs = join_paths(gw_prefix, gw_datadir)
 
 
 ################
