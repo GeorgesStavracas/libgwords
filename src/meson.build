@@ -1,4 +1,4 @@
-libgwords_headers_dir = join_paths(gw_prefix, get_option('includedir'), 'words')
+libgwords_headers_dir = join_paths(gw_prefix, get_option('includedir'), 'gwords')
 
 deps = [
   glib_dep,
@@ -6,8 +6,6 @@ deps = [
 ]
 
 libgwords_headers = [
-  'languages/C/gw-segmenter-fallback.h',
-  'languages/pt_BR/gw-segmenter-pt-br.h',
   'gwords.h',
   'gw-dictionary.h',
   'gw-group.h',
