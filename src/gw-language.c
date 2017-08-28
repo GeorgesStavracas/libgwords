@@ -17,6 +17,7 @@
  */
 
 #include "gw-init.h"
+#include "gw-dictionary.h"
 #include "gw-language.h"
 #include "gw-radix-tree.h"
 #include "gw-segmenter.h"
@@ -29,6 +30,7 @@ struct _GwLanguage
   gchar              *code;
 
   GwSegmenter        *segmenter;
+  GwDictionary       *dictionary;
 
   GError             *init_error;
   gboolean            valid : 1;
@@ -44,6 +46,7 @@ enum
 {
   PROP_0,
   PROP_CODE,
+  PROP_DICTIONARY,
   PROP_SEGMENTER,
   N_PROPS
 };
@@ -54,13 +57,95 @@ static GParamSpec *properties [N_PROPS] = { NULL, };
 /*
  * Auxiliary methods
  */
+
+static gboolean
+load_dictionary_file_at_path (GwLanguage  *self,
+                              const gchar *path)
+{
+  GError *error;
+  g_autofree gchar *dict_file;
+  g_autofree gchar *filepath;
+
+  dict_file = g_strdup_printf ("%s.gwdict", self->code);
+  filepath = g_build_filename (path, dict_file, NULL);
+
+  if (!g_file_test (filepath, G_FILE_TEST_EXISTS) || !g_file_test (filepath, G_FILE_TEST_IS_REGULAR))
+    return FALSE;
+
+  /* Setup the dictionary */
+  g_debug ("Loading dictionary file: %s", filepath);
+
+  self->dictionary = gw_dictionary_new ();
+
+  if (!gw_dictionary_load_from_file_sync (self->dictionary,
+                                          filepath,
+                                          NULL,
+                                          NULL,
+                                          &error))
+    {
+      g_warning ("Error loading dictionary: %s", error->message);
+      g_clear_error (&error);
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
 static void
-gw_language_set_language_code_internal (GwLanguage  *self,
-                                        const gchar *code)
+setup_dictionary (GwLanguage *self)
+{
+  const gchar * const * system_data_dirs;
+  g_autofree gchar *user_data_dir;
+
+  /* Try 1: g_get_user_data_dir */
+  user_data_dir = g_build_filename (g_get_user_data_dir (), "gwords", NULL);
+
+  if (load_dictionary_file_at_path (self, user_data_dir))
+    goto out;
+
+  /* Try 2: g_get_system_data_dirs */
+  system_data_dirs = g_get_system_data_dirs ();
+
+  for (; system_data_dirs && *system_data_dirs; system_data_dirs++)
+    {
+      g_autofree gchar *real_datadir;
+      const gchar *datadir;
+
+      datadir = *system_data_dirs;
+      real_datadir = g_build_filename (datadir, "gwords", NULL);
+
+      if (load_dictionary_file_at_path (self, real_datadir))
+        goto out;
+    }
+
+out:
+  if (self->dictionary)
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_DICTIONARY]);
+}
+
+static void
+setup_segmenter (GwLanguage *self)
 {
   GIOExtensionPoint *extension_point;
   GIOExtension *segmenter_extension;
 
+  extension_point = g_io_extension_point_lookup (GW_EXTENSION_POINT_SEGMENTER);
+  segmenter_extension = g_io_extension_point_get_extension_by_name (extension_point, self->code);
+
+  if (!segmenter_extension)
+    segmenter_extension = g_io_extension_point_get_extension_by_name (extension_point, "fallback");
+
+  self->segmenter = g_object_new (g_io_extension_get_type (segmenter_extension), NULL);
+
+  g_debug ("Loading segmenter: %s", g_type_name (g_io_extension_get_type (segmenter_extension)));
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SEGMENTER]);
+}
+
+static void
+gw_language_set_language_code_internal (GwLanguage  *self,
+                                        const gchar *code)
+{
   /* Default to the system language if nothing was provided */
   if (!code)
     {
@@ -84,16 +169,9 @@ gw_language_set_language_code_internal (GwLanguage  *self,
 
   self->valid = TRUE;
 
-  /* Segmenter */
-  extension_point = g_io_extension_point_lookup (GW_EXTENSION_POINT_SEGMENTER);
-  segmenter_extension = g_io_extension_point_get_extension_by_name (extension_point, self->code);
-
-  if (!segmenter_extension)
-    segmenter_extension = g_io_extension_point_get_extension_by_name (extension_point, "fallback");
-
-  self->segmenter = g_object_new (g_io_extension_get_type (segmenter_extension), NULL);
-
-  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SEGMENTER]);
+  /* Create the various objects */
+  setup_dictionary (self);
+  setup_segmenter (self);
 }
 
 /*
@@ -165,6 +243,10 @@ gw_language_get_property (GObject    *object,
       g_value_set_string (value, self->code);
       break;
 
+    case PROP_DICTIONARY:
+      g_value_set_object (value, self->dictionary);
+      break;
+
     case PROP_SEGMENTER:
       g_value_set_object (value, self->segmenter);
       break;
@@ -214,6 +296,12 @@ gw_language_class_init (GwLanguageClass *klass)
                                                     "Word segmenter of the language",
                                                     GW_TYPE_SEGMENTER,
                                                     G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
+
+  properties[PROP_DICTIONARY] = g_param_spec_object ("dictionary",
+                                                     "Word dictionary",
+                                                     "Word dictionary of the language",
+                                                     GW_TYPE_DICTIONARY,
+                                                     G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
@@ -348,4 +436,23 @@ gw_language_get_segmenter (GwLanguage *self)
   g_return_val_if_fail (GW_IS_LANGUAGE (self), NULL);
 
   return self->segmenter;
+}
+
+/**
+ * gw_language_get_dictionary:
+ * @self: a #GwLanguage
+ *
+ * Retrieves the dictionary registered for this language, or
+ * %NULL if @language has no dictionary file.
+ *
+ * Returns: (transfer none): a #GwDictionary
+ *
+ * Since: 0.1.0
+ */
+GwDictionary*
+gw_language_get_dictionary (GwLanguage *self)
+{
+  g_return_val_if_fail (GW_IS_LANGUAGE (self), NULL);
+
+  return self->dictionary;
 }

@@ -62,6 +62,8 @@ const gchar*         gw_language_get_language_code               (GwLanguage    
 
 GwSegmenter*         gw_language_get_segmenter                   (GwLanguage         *self);
 
+GwDictionary*        gw_language_get_dictionary                  (GwLanguage         *self);
+
 G_END_DECLS
 
 #endif /* GW_LANGUAGE_H */
