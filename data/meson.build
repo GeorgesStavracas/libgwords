@@ -1,4 +1,4 @@
-gw_datadir = join_paths(gw_prefix, get_option('datadir'), 'words')
+gw_datadir = join_paths(gw_prefix, get_option('datadir'), 'gwords')
 
 
 #################
@@ -6,7 +6,7 @@ gw_datadir = join_paths(gw_prefix, get_option('datadir'), 'words')
 #################
 
 gw_langs = [
-  'words/pt_BR.words'
+  'words/pt_BR.gwdict'
 ]
 
 foreach lang : gw_langs
