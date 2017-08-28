@@ -24,8 +24,8 @@ static void
 fallback (void)
 {
   g_autoptr (GwSegmenter) segmenter;
-  g_autoptr (GwLanguage) language;
   g_autoptr (GwString) str;
+  GwLanguage *language;
   GStrv words;
   gboolean success;
 
@@ -46,6 +46,16 @@ fallback (void)
 
   words = gw_segmenter_get_words (segmenter);
   g_assert_cmpuint (g_strv_length (words), ==, 12);
+
+  /* NULL string */
+  gw_segmenter_set_text (segmenter, NULL);
+  g_assert_null (gw_segmenter_get_text (segmenter));
+
+  success = gw_segmenter_segment_sync (segmenter, NULL, NULL);
+  g_assert_true (success);
+
+  words = gw_segmenter_get_words (segmenter);
+  g_assert_cmpuint (g_strv_length (words), ==, 0);
 }
 
 /**************************************************************************************************/
