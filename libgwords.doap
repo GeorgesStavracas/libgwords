@@ -20,7 +20,7 @@
     <foaf:Person>
       <foaf:name>Georges Basile Stavracas Neto</foaf:name>
       <foaf:mbox rdf:resource="mailto:gbsneto@gnome.org" />
-      <gnome:userid>feaneron</gnome:userid>
+      <gnome:userid>gbsneto</gnome:userid>
     </foaf:Person>
   </maintainer>
 </Project>
