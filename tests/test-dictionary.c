@@ -234,8 +234,6 @@ main (gint   argc,
 {
   g_test_init (&argc, &argv, NULL);
 
-  gw_init ();
-
   g_test_add_func ("/dictionary/init", dictionary_init);
   g_test_add_func ("/dictionary/insert", dictionary_insert);
   g_test_add_func ("/dictionary/remove", dictionary_remove);

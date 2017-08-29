@@ -144,8 +144,6 @@ main (gint   argc,
 {
   g_test_init (&argc, &argv, NULL);
 
-  gw_init ();
-
   g_test_add_func ("/language/get_language", get_language);
   g_test_add_func ("/language/get_language_async", get_language_async);
   g_test_add_func ("/language/get_system_language", get_system_language);

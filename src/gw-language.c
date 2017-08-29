@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "gw-init.h"
 #include "gw-dictionary.h"
+#include "gw-extension-points.h"
 #include "gw-language.h"
 #include "gw-radix-tree.h"
 #include "gw-segmenter.h"

@@ -1,4 +1,4 @@
-/* gw-init.h
+/* gw-extension-points.h
  *
  * Copyright (C) 2017 Georges Basile Stavracas Neto <georges.stavracas@gmail.com>
  *
@@ -16,17 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GW_INIT_H
-#define GW_INIT_H
+#ifndef GW_EXTENSION_POINTS_H
+#define GW_EXTENSION_POINTS_H
 
 #include <glib.h>
 
-#define GW_EXTENSION_POINT_SEGMENTER         "gw-segmenter-ep"
-
 G_BEGIN_DECLS
 
-void                 gw_init                                     (void);
+#define GW_EXTENSION_POINT_SEGMENTER         "gw-segmenter-ep"
 
 G_END_DECLS
 
-#endif /* GW_INIT_H */
+#endif /* GW_EXTENSION_POINTS_H */

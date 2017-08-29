@@ -8,8 +8,8 @@ deps = [
 libgwords_headers = [
   'gwords.h',
   'gw-dictionary.h',
+  'gw-extension-points.h',
   'gw-group.h',
-  'gw-init.h',
   'gw-language.h',
   'gw-radix-tree.h',
   'gw-segmenter.h',

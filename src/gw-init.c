@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "gw-init.h"
+#include "gw-extension-points.h"
 #include "gw-init-segmenters.h"
 #include "gw-segmenter.h"
 
@@ -34,18 +34,13 @@ init_segmenters (void)
 #undef implement_segmenter
 }
 
-/**
- * gw_init:
- *
- * Main initializer of libgwords. Must be called before any other
- * call to libgwords API.
- *
- * Since: 0.1.0
- */
-void
-gw_init (void)
+__attribute__((constructor))
+static void
+_gw_init (void)
 {
   GIOExtensionPoint *extension_point;
+
+  g_message ("initializing");
 
   /* Extension point for GwSegmenter */
   extension_point = g_io_extension_point_register (GW_EXTENSION_POINT_SEGMENTER);

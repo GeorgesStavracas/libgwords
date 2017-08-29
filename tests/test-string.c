@@ -58,8 +58,6 @@ main (gint   argc,
 {
   g_test_init (&argc, &argv, NULL);
 
-  gw_init ();
-
   g_test_add_func ("/string/init", string_init);
   g_test_add_func ("/string/static_init", static_string_init);
 
