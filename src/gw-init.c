@@ -40,8 +40,6 @@ _gw_init (void)
 {
   GIOExtensionPoint *extension_point;
 
-  g_message ("initializing");
-
   /* Extension point for GwSegmenter */
   extension_point = g_io_extension_point_register (GW_EXTENSION_POINT_SEGMENTER);
   g_io_extension_point_set_required_type (extension_point, GW_TYPE_SEGMENTER);
