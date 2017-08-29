@@ -84,7 +84,7 @@ pkgg = import('pkgconfig')
 pkgg.generate(
          name: 'libgwords',
   description: 'Natural Language Text Management for GNOME',
-     filebase: 'words-' + gw_major_version,
+     filebase: 'gwords-' + gw_major_version,
       version: gw_version,
     libraries: libgwords,
      requires: ['glib-2.0', 'gobject-2.0', 'gio-2.0'],
