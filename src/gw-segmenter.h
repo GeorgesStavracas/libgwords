@@ -34,36 +34,25 @@ struct _GwSegmenterInterface
 {
   GTypeInterface parent;
 
-  GwString*          (*get_text)                                 (GwSegmenter        *self);
-
-  void               (*set_text)                                 (GwSegmenter        *self,
-                                                                  GwString           *text);
-
-  gboolean           (*segment)                                  (GwSegmenter        *self,
+  GStrv              (*segment)                                  (GwSegmenter        *self,
+                                                                  GwString           *text,
                                                                   GCancellable       *cancellable,
                                                                   GError            **error);
-
-  GStrv              (*get_words)                                (GwSegmenter        *self);
 };
 
-GwString*            gw_segmenter_get_text                       (GwSegmenter        *self);
-
-void                 gw_segmenter_set_text                       (GwSegmenter        *self,
-                                                                  GwString           *text);
-
 void                 gw_segmenter_segment                        (GwSegmenter        *self,
+                                                                  GwString           *text,
                                                                   GAsyncReadyCallback callback,
                                                                   GCancellable       *cancellable,
                                                                   gpointer            user_data);
 
-gboolean             gw_segmenter_segment_finish                 (GAsyncResult       *result,
+GStrv                gw_segmenter_segment_finish                 (GAsyncResult       *result,
                                                                   GError            **error);
 
-gboolean             gw_segmenter_segment_sync                   (GwSegmenter        *self,
+GStrv                gw_segmenter_segment_sync                   (GwSegmenter        *self,
+                                                                  GwString           *text,
                                                                   GCancellable       *cancellable,
                                                                   GError            **error);
-
-GStrv                gw_segmenter_get_words                      (GwSegmenter        *self);
 
 G_END_DECLS
 

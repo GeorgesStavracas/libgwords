@@ -27,7 +27,6 @@ fallback (void)
   g_autoptr (GwString) str;
   GwLanguage *language;
   GStrv words;
-  gboolean success;
 
   str = gw_string_new_static ("This segmenter should break only by whitespaces, commas,\n periods and new lines.");
   language = gw_language_new_sync ("invalid", NULL, NULL);
@@ -38,23 +37,15 @@ fallback (void)
   g_assert_nonnull (segmenter);
   g_assert_cmpstr (g_type_name (G_OBJECT_TYPE (segmenter)), ==, "GwSegmenterFallback");
 
-  gw_segmenter_set_text (segmenter, str);
-  g_assert (gw_segmenter_get_text (segmenter) == str);
+  words = gw_segmenter_segment_sync (segmenter, str, NULL, NULL);
 
-  success = gw_segmenter_segment_sync (segmenter, NULL, NULL);
-  g_assert_true (success);
-
-  words = gw_segmenter_get_words (segmenter);
+  g_assert_nonnull (words);
   g_assert_cmpuint (g_strv_length (words), ==, 12);
 
   /* NULL string */
-  gw_segmenter_set_text (segmenter, NULL);
-  g_assert_null (gw_segmenter_get_text (segmenter));
+  words = gw_segmenter_segment_sync (segmenter, NULL, NULL, NULL);
 
-  success = gw_segmenter_segment_sync (segmenter, NULL, NULL);
-  g_assert_true (success);
-
-  words = gw_segmenter_get_words (segmenter);
+  g_assert_nonnull (words);
   g_assert_cmpuint (g_strv_length (words), ==, 0);
 }
 
@@ -67,7 +58,6 @@ pt_BR (void)
   g_autoptr (GwString) str;
   GwLanguage *language;
   GStrv words;
-  gboolean success;
 
   str = gw_string_new_static ("Oi, eu sou o Goku! E essas frases devem ser quebradas corretamente - por exemplo,\n"
                               "mesmo que eu adicione novas linhas e hífens, ainda deve funcionar!");
@@ -79,23 +69,15 @@ pt_BR (void)
   g_assert_nonnull (segmenter);
   g_assert_cmpstr (g_type_name (G_OBJECT_TYPE (segmenter)), ==, "GwSegmenterPtBr");
 
-  gw_segmenter_set_text (segmenter, str);
-  g_assert (gw_segmenter_get_text (segmenter) == str);
+  words = gw_segmenter_segment_sync (segmenter, str, NULL, NULL);
 
-  success = gw_segmenter_segment_sync (segmenter, NULL, NULL);
-  g_assert_true (success);
-
-  words = gw_segmenter_get_words (segmenter);
+  g_assert_nonnull (segmenter);
   g_assert_cmpuint (g_strv_length (words), ==, 25);
 
   /* NULL string */
-  gw_segmenter_set_text (segmenter, NULL);
-  g_assert_null (gw_segmenter_get_text (segmenter));
+  words = gw_segmenter_segment_sync (segmenter, NULL, NULL, NULL);
 
-  success = gw_segmenter_segment_sync (segmenter, NULL, NULL);
-  g_assert_true (success);
-
-  words = gw_segmenter_get_words (segmenter);
+  g_assert_nonnull (segmenter);
   g_assert_cmpuint (g_strv_length (words), ==, 0);
 }
 

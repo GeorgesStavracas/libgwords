@@ -18,6 +18,7 @@
 
 
 #include "gw-segmenter.h"
+#include "gw-string.h"
 
 G_DEFINE_INTERFACE (GwSegmenter, gw_segmenter, G_TYPE_OBJECT)
 
@@ -27,9 +28,14 @@ segment_in_thread_cb (GTask        *task,
                       gpointer      task_data,
                       GCancellable *cancellable)
 {
-  GError *local_error = NULL;
+  GwString *text;
+  GError *local_error;
+  GStrv words;
 
-  gw_segmenter_segment_sync (source_object, cancellable, &local_error);
+  text = task_data;
+  local_error = NULL;
+
+  words = gw_segmenter_segment_sync (source_object, text, cancellable, &local_error);
 
   if (local_error)
     {
@@ -37,7 +43,7 @@ segment_in_thread_cb (GTask        *task,
       return;
     }
 
-  g_task_return_boolean (task, TRUE);
+  g_task_return_pointer (task, words, NULL);
 }
 
 static void
@@ -46,46 +52,9 @@ gw_segmenter_default_init (GwSegmenterInterface *iface)
 }
 
 /**
- * gw_segmenter_get_text:
- * @self: a #GwSegmenter
- *
- * Retrieves the current text being segmented by @self.
- *
- * Returns: (transfer none)(nullable): a #GwString
- *
- * Since: 0.1.0
- */
-GwString*
-gw_segmenter_get_text (GwSegmenter *self)
-{
-  g_return_val_if_fail (GW_IS_SEGMENTER (self), NULL);
-  g_return_val_if_fail (GW_SEGMENTER_GET_IFACE (self)->get_text, NULL);
-
-  return GW_SEGMENTER_GET_IFACE (self)->get_text (self);
-}
-
-/**
- * gw_segmenter_set_text:
- * @self: a #GwSegmenter
- * @text: (nullable): a #GwString
- *
- * Sets the text to be segmented by @self to @text.
- *
- * Since: 0.1.0
- */
-void
-gw_segmenter_set_text (GwSegmenter *self,
-                       GwString    *text)
-{
-  g_return_if_fail (GW_IS_SEGMENTER (self));
-  g_return_if_fail (GW_SEGMENTER_GET_IFACE (self)->set_text);
-
-  GW_SEGMENTER_GET_IFACE (self)->set_text (self, text);
-}
-
-/**
  * gw_segmenter_segment:
  * @self: a #GwSegmenter
+ * @text: the text to segment
  * @callback: (): callback to call when the operation is done
  * @cancellable: (nullable): cancellable to cancel the operation
  * @user_data:
@@ -96,6 +65,7 @@ gw_segmenter_set_text (GwSegmenter *self,
  */
 void
 gw_segmenter_segment (GwSegmenter         *self,
+                      GwString            *text,
                       GAsyncReadyCallback  callback,
                       GCancellable        *cancellable,
                       gpointer             user_data)
@@ -103,9 +73,9 @@ gw_segmenter_segment (GwSegmenter         *self,
   GTask *task;
 
   g_return_if_fail (GW_IS_SEGMENTER (self));
-  g_return_if_fail (gw_segmenter_get_text (self) != NULL);
 
   task = g_task_new (self, cancellable, callback, user_data);
+  g_task_set_task_data (task, gw_string_ref (text), (GDestroyNotify) gw_string_unref);
 
   g_task_run_in_thread (task, segment_in_thread_cb);
 }
@@ -117,23 +87,24 @@ gw_segmenter_segment (GwSegmenter         *self,
  *
  * Finishes the segmentation operation started by gw_segmenter_segment().
  *
- * Returns: %TRUE for success or %FALSE for failure.
+ * Returns: (transfer full)(nullable): a #GStrv with the segmented words.
  *
  * Since: 0.1.0
  */
-gboolean
+GStrv
 gw_segmenter_segment_finish (GAsyncResult  *result,
                              GError       **error)
 {
   g_return_val_if_fail (G_IS_TASK (result), FALSE);
   g_return_val_if_fail (!error || !*error, FALSE);
 
-  return g_task_propagate_boolean (G_TASK (result), error);
+  return g_task_propagate_pointer (G_TASK (result), error);
 }
 
 /**
  * gw_segmenter_segment:
  * @self: a #GwSegmenter
+ * @text: the text to segment
  * @cancellable: (nullable): a #GCancellable
  * @error: (nullable): return location for the error
  *
@@ -142,12 +113,13 @@ gw_segmenter_segment_finish (GAsyncResult  *result,
  *
  * See gw_segmenter_segment() for the asynchronous version.
  *
- * Returns: %TRUE on success or %FALSE on failure.
+ * Returns: (transfer full)(nullable): a #GStrv with the segmented words.
  *
  * Since: 0.1.0
  */
-gboolean
+GStrv
 gw_segmenter_segment_sync (GwSegmenter   *self,
+                           GwString      *text,
                            GCancellable  *cancellable,
                            GError       **error)
 {
@@ -155,25 +127,6 @@ gw_segmenter_segment_sync (GwSegmenter   *self,
   g_return_val_if_fail (GW_IS_SEGMENTER (self), FALSE);
   g_return_val_if_fail (GW_SEGMENTER_GET_IFACE (self)->segment, FALSE);
 
-  return GW_SEGMENTER_GET_IFACE (self)->segment (self, cancellable, error);
+  return GW_SEGMENTER_GET_IFACE (self)->segment (self, text, cancellable, error);
 }
 
-/**
- * gw_segmenter_get_words:
- * @self: a #GwSegmenter
- *
- * Retrieves the list of words segmented by gw_segmenter_segment().
- *
- * Returns: (transfer none)(nullable): the %NULL-terminated list of gw. Do
- * not free.
- *
- * Since: 0.1.0
- */
-GStrv
-gw_segmenter_get_words (GwSegmenter *self)
-{
-  g_return_val_if_fail (GW_IS_SEGMENTER (self), NULL);
-  g_return_val_if_fail (GW_SEGMENTER_GET_IFACE (self)->get_words, NULL);
-
-  return GW_SEGMENTER_GET_IFACE (self)->get_words (self);
-}

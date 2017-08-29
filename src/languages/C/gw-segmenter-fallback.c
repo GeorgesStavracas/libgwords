@@ -25,9 +25,6 @@
 struct _GwSegmenterFallback
 {
   GObject             parent;
-
-  GwString           *text;
-  GPtrArray          *words;
 };
 
 static void          gw_segmenter_segmenter_iface_init           (GwSegmenterInterface *iface);
@@ -39,57 +36,28 @@ G_DEFINE_TYPE_WITH_CODE (GwSegmenterFallback, gw_segmenter_fallback, G_TYPE_OBJE
  * GwSegmenter implemntation
  */
 
-static GwString*
-gw_segmenter_fallback_get_text (GwSegmenter *segmenter)
-{
-  GwSegmenterFallback *self;
-
-  g_return_val_if_fail (GW_IS_SEGMENTER_FALLBACK (segmenter), NULL);
-
-  self = GW_SEGMENTER_FALLBACK (segmenter);
-
-  return self->text;
-}
-
-static void
-gw_segmenter_fallback_set_text (GwSegmenter *segmenter,
-                                GwString    *text)
-{
-  GwSegmenterFallback *self;
-
-  g_return_if_fail (GW_IS_SEGMENTER_FALLBACK (segmenter));
-
-  self = GW_SEGMENTER_FALLBACK (segmenter);
-
-  g_clear_pointer (&self->text, gw_string_unref);
-  self->text = text ? gw_string_ref (text) : NULL;
-
-  g_ptr_array_remove_range (self->words, 0, self->words->len);
-}
-
 static gboolean
 gw_segmenter_fallback_segment (GwSegmenter   *segmenter,
+                               GwString      *text,
                                GCancellable  *cancellable,
                                GError       **error)
 {
-  GwSegmenterFallback *self;
+  GPtrArray *words;
   gboolean was_word, is_word;
   gchar *aux, *start, *end;
 
-  g_return_val_if_fail (GW_IS_SEGMENTER_FALLBACK (segmenter), FALSE);
+  g_return_val_if_fail (GW_IS_SEGMENTER_FALLBACK (segmenter), NULL);
 
-  self = GW_SEGMENTER_FALLBACK (segmenter);
   is_word = was_word = FALSE;
   start = end = NULL;
 
-  /* Always cleanup */
-  g_ptr_array_remove_range (self->words, 0, self->words->len);
+  words = g_ptr_array_new ();
 
   /* Don't attempt to segment NULL texts */
-  if (!self->text)
+  if (!text)
     goto out;
 
-  aux = self->text;
+  aux = text;
 
   /*
    * The fallback segmenter is pretty stupid, but it's the best we
@@ -132,7 +100,7 @@ gw_segmenter_fallback_segment (GwSegmenter   *segmenter,
           memcpy (substring, start, length);
           substring[length] = '\0';
 
-          g_ptr_array_add (self->words, substring);
+          g_ptr_array_add (words, substring);
         }
 
       aux = g_utf8_next_char (aux);
@@ -140,46 +108,20 @@ gw_segmenter_fallback_segment (GwSegmenter   *segmenter,
   while (aux && *aux);
 
 out:
-  g_ptr_array_add (self->words, NULL);
+  g_ptr_array_add (words, NULL);
 
-  return TRUE;
-}
-
-static GStrv
-gw_segmenter_fallback_get_words (GwSegmenter *segmenter)
-{
-  GwSegmenterFallback *self;
-
-  g_return_val_if_fail (GW_IS_SEGMENTER_FALLBACK (segmenter), NULL);
-
-  self = GW_SEGMENTER_FALLBACK (segmenter);
-
-  return (GStrv) self->words->pdata;
+  return (GStrv) g_ptr_array_free (words, FALSE);
 }
 
 static void
 gw_segmenter_segmenter_iface_init (GwSegmenterInterface *iface)
 {
-  iface->get_text = gw_segmenter_fallback_get_text;
-  iface->set_text = gw_segmenter_fallback_set_text;
   iface->segment = gw_segmenter_fallback_segment;
-  iface->get_words = gw_segmenter_fallback_get_words;
 }
 
 /*
  * GObject overrides
  */
-
-static void
-gw_segmenter_fallback_finalize (GObject *object)
-{
-  GwSegmenterFallback *self = (GwSegmenterFallback *)object;
-
-  g_clear_pointer (&self->words, g_ptr_array_unref);
-  g_clear_pointer (&self->text, gw_string_unref);
-
-  G_OBJECT_CLASS (gw_segmenter_fallback_parent_class)->finalize (object);
-}
 
 static void
 gw_segmenter_fallback_get_property (GObject    *object,
@@ -204,7 +146,6 @@ gw_segmenter_fallback_class_init (GwSegmenterFallbackClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  object_class->finalize = gw_segmenter_fallback_finalize;
   object_class->get_property = gw_segmenter_fallback_get_property;
   object_class->set_property = gw_segmenter_fallback_set_property;
 }
@@ -212,5 +153,4 @@ gw_segmenter_fallback_class_init (GwSegmenterFallbackClass *klass)
 static void
 gw_segmenter_fallback_init (GwSegmenterFallback *self)
 {
-  self->words = g_ptr_array_new_with_free_func (g_free);
 }
