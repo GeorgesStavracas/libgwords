@@ -23,7 +23,7 @@
 
 G_BEGIN_DECLS
 
-#define GWORDS_INSIDE
+#define GW_INSIDE
 # include "gw-dictionary.h"
 # include "gw-extension-points.h"
 # include "gw-group.h"
@@ -33,7 +33,7 @@ G_BEGIN_DECLS
 # include "gw-string.h"
 # include "gw-utils.h"
 # include "gw-version.h"
-#undef GWORDS_INSIDE
+#undef GW_INSIDE
 
 G_END_DECLS
 
