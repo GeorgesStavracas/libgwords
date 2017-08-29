@@ -32,15 +32,14 @@ program, this can change during the development.
 
  - [x] Adaptative Radix Tree
    - [x] GwRadixTree
- - [ ] Dictionaries
-   - [ ] GwDictionary
- - [ ] Word segmentation
-   - [ ] GwWord
-   - [ ] GwWordSegmenter
-   - [ ] GwWordSegmenterFallback
- - [ ] String iteration
-   - [ ] GwString
-   - [ ] GwStringIterator
+ - [x] Dictionaries
+   - [x] GwDictionary
+ - [x] Word segmentation
+   - [x] GwSegmenter
+   - [x] GwSegmenterFallback
+   - [x] GwSegmenterPtBr
+ - [x] Refcounted strings
+   - [x] GwString
  - [ ] Sentence manipulation
    - [ ] GwSentence
    - [ ] GwSentenceModifier
@@ -50,4 +49,5 @@ program, this can change during the development.
  - [ ] Grammar decomposition
  - [ ] Root extractor
  - [ ] Noun conjugation
+   - [ ] GwWord
    - [ ] GwNoun
