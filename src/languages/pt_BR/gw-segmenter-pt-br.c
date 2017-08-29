@@ -25,12 +25,22 @@
 struct _GwSegmenterPtBr
 {
   GObject             parent;
+
+  GwLanguage         *language;
 };
 
 static void          gw_segmenter_pt_br_iface_init               (GwSegmenterInterface *iface);
 
 G_DEFINE_TYPE_WITH_CODE (GwSegmenterPtBr, gw_segmenter_pt_br, G_TYPE_OBJECT,
                          G_IMPLEMENT_INTERFACE (GW_TYPE_SEGMENTER, gw_segmenter_pt_br_iface_init))
+
+enum
+{
+  PROP_0,
+  PROP_LANGUAGE,
+  N_PROPS
+};
+
 
 /*
  * GwSegmenter implemntation
@@ -109,13 +119,37 @@ gw_segmenter_pt_br_iface_init (GwSegmenterInterface *iface)
   iface->segment = gw_segmenter_pt_br_segment;
 }
 
+/*
+ * GObject overrides
+ */
+
+static void
+gw_segmenter_pt_br_dispose (GObject *object)
+{
+  GwSegmenterPtBr *self = GW_SEGMENTER_PT_BR (object);
+
+  g_clear_object (&self->language);
+
+  G_OBJECT_CLASS (gw_segmenter_pt_br_parent_class)->dispose (object);
+}
+
 static void
 gw_segmenter_pt_br_get_property (GObject    *object,
                                  guint       prop_id,
                                  GValue     *value,
                                  GParamSpec *pspec)
 {
-  G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+  GwSegmenterPtBr *self = GW_SEGMENTER_PT_BR (object);
+
+  switch (prop_id)
+    {
+    case PROP_LANGUAGE:
+      g_value_set_object (value, self->language);
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
 }
 
 static void
@@ -124,7 +158,17 @@ gw_segmenter_pt_br_set_property (GObject      *object,
                                  const GValue *value,
                                  GParamSpec   *pspec)
 {
-  G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+  GwSegmenterPtBr *self = GW_SEGMENTER_PT_BR (object);
+
+  switch (prop_id)
+    {
+    case PROP_LANGUAGE:
+      self->language = g_value_dup_object (value);
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
 }
 
 static void
@@ -132,8 +176,11 @@ gw_segmenter_pt_br_class_init (GwSegmenterPtBrClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
+  object_class->dispose = gw_segmenter_pt_br_dispose;
   object_class->get_property = gw_segmenter_pt_br_get_property;
   object_class->set_property = gw_segmenter_pt_br_set_property;
+
+  g_object_class_override_property (object_class, PROP_LANGUAGE, "language");
 }
 
 static void

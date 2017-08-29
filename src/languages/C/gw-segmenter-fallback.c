@@ -25,6 +25,8 @@
 struct _GwSegmenterFallback
 {
   GObject             parent;
+
+  GwLanguage         *language;
 };
 
 static void          gw_segmenter_segmenter_iface_init           (GwSegmenterInterface *iface);
@@ -32,11 +34,19 @@ static void          gw_segmenter_segmenter_iface_init           (GwSegmenterInt
 G_DEFINE_TYPE_WITH_CODE (GwSegmenterFallback, gw_segmenter_fallback, G_TYPE_OBJECT,
                          G_IMPLEMENT_INTERFACE (GW_TYPE_SEGMENTER, gw_segmenter_segmenter_iface_init))
 
+enum
+{
+  PROP_0,
+  PROP_LANGUAGE,
+  N_PROPS
+};
+
+
 /*
  * GwSegmenter implemntation
  */
 
-static gboolean
+static GStrv
 gw_segmenter_fallback_segment (GwSegmenter   *segmenter,
                                GwString      *text,
                                GCancellable  *cancellable,
@@ -124,12 +134,32 @@ gw_segmenter_segmenter_iface_init (GwSegmenterInterface *iface)
  */
 
 static void
+gw_segmenter_fallback_dispose (GObject *object)
+{
+  GwSegmenterFallback *self = GW_SEGMENTER_FALLBACK (object);
+
+  g_clear_object (&self->language);
+
+  G_OBJECT_CLASS (gw_segmenter_fallback_parent_class)->dispose (object);
+}
+
+static void
 gw_segmenter_fallback_get_property (GObject    *object,
                                     guint       prop_id,
                                     GValue     *value,
                                     GParamSpec *pspec)
 {
-  G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+  GwSegmenterFallback *self = GW_SEGMENTER_FALLBACK (object);
+
+  switch (prop_id)
+    {
+    case PROP_LANGUAGE:
+      g_value_set_object (value, self->language);
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
 }
 
 static void
@@ -138,7 +168,17 @@ gw_segmenter_fallback_set_property (GObject      *object,
                                     const GValue *value,
                                     GParamSpec   *pspec)
 {
-  G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+  GwSegmenterFallback *self = GW_SEGMENTER_FALLBACK (object);
+
+  switch (prop_id)
+    {
+    case PROP_LANGUAGE:
+      self->language = g_value_dup_object (value);
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
 }
 
 static void
@@ -146,8 +186,11 @@ gw_segmenter_fallback_class_init (GwSegmenterFallbackClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
+  object_class->dispose = gw_segmenter_fallback_dispose;
   object_class->get_property = gw_segmenter_fallback_get_property;
   object_class->set_property = gw_segmenter_fallback_set_property;
+
+  g_object_class_override_property (object_class, PROP_LANGUAGE, "language");
 }
 
 static void

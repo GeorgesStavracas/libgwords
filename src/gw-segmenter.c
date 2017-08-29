@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
+#include "gw-language.h"
 #include "gw-segmenter.h"
 #include "gw-string.h"
 
@@ -49,6 +49,38 @@ segment_in_thread_cb (GTask        *task,
 static void
 gw_segmenter_default_init (GwSegmenterInterface *iface)
 {
+  /**
+   * GwSegmenter:language:
+   *
+   * The language of the segmenter, used to have access to language-specific
+   * information such as word dictionaries and conjugators.
+   *
+   * Since: 0.1
+   */
+  g_object_interface_install_property (iface,
+                                       g_param_spec_object ("language",
+                                                            "Language",
+                                                            "The language of the segmenter",
+                                                            GW_TYPE_LANGUAGE,
+                                                            G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
+}
+
+GwLanguage*
+gw_segmenter_get_language (GwSegmenter *self)
+{
+  GwLanguage *language;
+
+  g_return_val_if_fail (GW_IS_SEGMENTER (self), NULL);
+
+  g_object_get (self, "language", &language, NULL);
+
+  /*
+   * g_object_get() increases the refcount, but this function is
+   * transfer-none, so undo the refcount increase
+   */
+  g_object_unref (language);
+
+  return language;
 }
 
 /**

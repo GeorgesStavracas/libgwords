@@ -137,7 +137,9 @@ setup_segmenter (GwLanguage *self)
   if (!segmenter_extension)
     segmenter_extension = g_io_extension_point_get_extension_by_name (extension_point, "fallback");
 
-  self->segmenter = g_object_new (g_io_extension_get_type (segmenter_extension), NULL);
+  self->segmenter = g_object_new (g_io_extension_get_type (segmenter_extension),
+                                  "language", self,
+                                   NULL);
 
   g_debug ("Loading segmenter: %s", g_type_name (g_io_extension_get_type (segmenter_extension)));
 

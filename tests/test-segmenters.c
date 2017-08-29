@@ -68,6 +68,7 @@ pt_BR (void)
 
   g_assert_nonnull (segmenter);
   g_assert_cmpstr (g_type_name (G_OBJECT_TYPE (segmenter)), ==, "GwSegmenterPtBr");
+  g_assert (gw_segmenter_get_language (segmenter) == language);
 
   words = gw_segmenter_segment_sync (segmenter, str, NULL, NULL);
 

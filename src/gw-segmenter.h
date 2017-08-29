@@ -40,6 +40,8 @@ struct _GwSegmenterInterface
                                                                   GError            **error);
 };
 
+GwLanguage*          gw_segmenter_get_language                   (GwSegmenter        *self);
+
 void                 gw_segmenter_segment                        (GwSegmenter        *self,
                                                                   GwString           *text,
                                                                   GAsyncReadyCallback callback,
