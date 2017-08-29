@@ -10,9 +10,9 @@
   <description>libgwords is a GObject-based library to handle words, dictionaries
     and text structures, designed to be extended to allow high-quality natural
     language text processing.</description>
-  <homepage rdf:resource="https://github.com/GeorgesStavracas/libwords" />
-  <download-page rdf:resource="https://github.com/GeorgesStavracas/libwords/releases" />
-  <bug-database rdf:resource="https://github.com/GeorgesStavracas/libwords/issues" />
+  <homepage rdf:resource="https://github.com/GeorgesStavracas/libgwords" />
+  <download-page rdf:resource="https://github.com/GeorgesStavracas/libgwords/releases" />
+  <bug-database rdf:resource="https://github.com/GeorgesStavracas/libgwords/issues" />
   <category rdf:resource="http://api.gnome.org/doap-extensions#core" />
   <programming-language>C</programming-language>
 
