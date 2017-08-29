@@ -55,7 +55,7 @@ configure_file(
 #############
 
 libgwords = shared_library(
-              'words-' + gw_major_version,
+              'gwords-' + gw_major_version,
               sources: libgwords_sources,
             soversion: gw_major_version,
               version: gw_major_version,
