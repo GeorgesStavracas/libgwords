@@ -58,7 +58,7 @@ test_radix_tree = executable(
   dependencies: libgwords_dep,
 )
 
-test('test-radix-tree', test_radix_tree)
+test('test-radix-tree', test_radix_tree, timeout: 60)
 
 
 ##############
