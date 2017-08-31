@@ -8,4 +8,5 @@ build-libgwords:
   script:
   - ./configure
   - make
+  - make check
   - make install
