@@ -10,7 +10,7 @@ build-libgwords:
   script:
   - ./configure
   - make
-  - make check
   - make install
+  - make check
   after_script:
   - cat _build/meson-logs/testlog.txt
