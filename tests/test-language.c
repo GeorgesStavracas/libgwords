@@ -189,10 +189,10 @@ get_valid_system_language_async (void)
 static void
 get_invalid_system_language (void)
 {
-  g_setenv ("LANGUAGE", "", TRUE);
-  g_setenv ("LC_ALL", "", TRUE);
-  g_setenv ("LANG", "", TRUE);
-  g_setenv ("LC_MESSAGES", "", TRUE);
+  g_unsetenv ("LANGUAGE");
+  g_unsetenv ("LC_ALL");
+  g_unsetenv ("LANG");
+  g_unsetenv ("LC_MESSAGES");
 
   get_system_language ();
 }
@@ -203,10 +203,10 @@ get_invalid_system_language (void)
 static void
 get_invalid_system_language_async (void)
 {
-  g_setenv ("LANGUAGE", "", TRUE);
-  g_setenv ("LC_ALL", "", TRUE);
-  g_setenv ("LANG", "", TRUE);
-  g_setenv ("LC_MESSAGES", "", TRUE);
+  g_unsetenv ("LANGUAGE");
+  g_unsetenv ("LC_ALL");
+  g_unsetenv ("LANG");
+  g_unsetenv ("LC_MESSAGES");
 
   get_system_language_async ();
 }
