@@ -2,6 +2,7 @@ image: fedora:26
 stages:
   - build
   - test
+  - print_error
 
 before_script:
   - dnf install -y gcc meson ninja-build gettext gtk-doc glib2-devel
@@ -19,11 +20,8 @@ test-libgwords:
   script:
   - make check
 
-  # failed to run the tests
-  after-script:
-  when: on_failure
+error-libgwords:
+  stage: print_error
+  script:
   - cat _build/meson-logs/testlog.txt
-
-  after-script:
-  when: on_success
-  - make install
+  when: on_failure
