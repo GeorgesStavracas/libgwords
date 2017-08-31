@@ -1,12 +1,29 @@
 image: fedora:26
 stages:
   - build
+  - test
+
 before_script:
   - dnf install -y gcc meson ninja-build gettext gtk-doc glib2-devel
+
+# Job: build
 build-libgwords:
   stage: build
   script:
   - ./configure
   - make
+
+# Job: test
+test-libgwords:
+  stage: test
+  script:
   - make check
+
+  # failed to run the tests
+  after-script:
+  when: on_failure
+  - cat _build/meson-logs/testlog.txt
+
+  after-script:
+  when: on_success
   - make install
