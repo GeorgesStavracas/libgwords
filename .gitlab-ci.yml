@@ -6,6 +6,6 @@ before_script:
 build-libgwords:
   stage: build
   script:
-  - configure
+  - ./configure
   - make
   - make install
