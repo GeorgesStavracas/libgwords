@@ -3,7 +3,7 @@ stages:
   - build
 before_script:
   - dnf install -y gcc meson ninja-build gettext gtk-doc glib2-devel
-build-libcloudproviders:
+build-libgwords:
   stage: build
   script:
   - configure
