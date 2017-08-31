@@ -76,6 +76,39 @@ get_language (void)
   g_clear_object (&language);
 }
 
+/**************************************************************************************************/
+
+static void
+get_system_language (void)
+{
+  GwLanguage *language;
+  GError *error;
+  gboolean system_language_set;
+
+  /* Set a random language if host system has none set */
+  system_language_set = gw_get_system_language (NULL, NULL);
+
+  /* Create the language */
+  error = NULL;
+  language = gw_language_new_sync (NULL, NULL, &error);
+
+  if (!system_language_set)
+    {
+      g_assert_error (error, GW_LANGUAGE_ERROR, GW_LANGUAGE_ERROR_INVALID);
+      g_assert_null (language);
+    }
+  else
+    {
+      g_message ("Language: %s", gw_language_get_language_code (language));
+
+      g_assert_nonnull (language);
+      g_assert_no_error (error);
+
+      g_clear_object (&language);
+    }
+
+  g_clear_object (&language);
+}
 
 /**************************************************************************************************/
 
@@ -87,19 +120,32 @@ system_language_loaded_cb (GObject      *source_object,
   GwLanguage *language;
   GMainLoop *mainloop;
   GError *error;
+  gboolean system_language_set;
+
+  /* Set a random language if host system has none set */
+  system_language_set = gw_get_system_language (NULL, NULL);
 
   error = NULL;
   mainloop = user_data;
   language = gw_language_new_finish (res, &error);
 
-  g_message ("Language: %s", gw_language_get_language_code (language));
+  if (!system_language_set)
+    {
+      g_assert_error (error, GW_LANGUAGE_ERROR, GW_LANGUAGE_ERROR_INVALID);
+      g_assert_null (language);
+    }
+  else
+    {
+      g_message ("Language: %s", gw_language_get_language_code (language));
 
-  g_assert_nonnull (language);
-  g_assert (!error);
+      g_assert_nonnull (language);
+      g_assert_no_error (error);
+
+      g_clear_object (&language);
+    }
 
   g_main_loop_quit (mainloop);
 
-  g_clear_object (&language);
 }
 
 static void
@@ -117,22 +163,52 @@ get_system_language_async (void)
   g_main_loop_run (mainloop);
 }
 
+/**************************************************************************************************/
+
+static void
+get_valid_system_language (void)
+{
+  g_setenv ("LANGUAGE", "he_IL.utf8", TRUE);
+
+  get_system_language ();
+}
+
 
 /**************************************************************************************************/
 
 static void
-get_system_language (void)
+get_valid_system_language_async (void)
 {
-  GwLanguage *language;
-  GError *error;
+  g_setenv ("LANGUAGE", "he_IL.utf8", TRUE);
 
-  error = NULL;
-  language = gw_language_new_sync (NULL, NULL, &error);
+  get_system_language_async ();
+}
 
-  g_assert_nonnull (language);
-  g_assert (!error);
+/**************************************************************************************************/
 
-  g_clear_object (&language);
+static void
+get_invalid_system_language (void)
+{
+  g_unsetenv ("LANGUAGE");
+  g_unsetenv ("LC_ALL");
+  g_unsetenv ("LANG");
+  g_unsetenv ("LC_MESSAGES");
+
+  get_system_language ();
+}
+
+
+/**************************************************************************************************/
+
+static void
+get_invalid_system_language_async (void)
+{
+  g_unsetenv ("LANGUAGE");
+  g_unsetenv ("LC_ALL");
+  g_unsetenv ("LANG");
+  g_unsetenv ("LC_MESSAGES");
+
+  get_system_language_async ();
 }
 
 
@@ -146,8 +222,10 @@ main (gint   argc,
 
   g_test_add_func ("/language/get_language", get_language);
   g_test_add_func ("/language/get_language_async", get_language_async);
-  g_test_add_func ("/language/get_system_language", get_system_language);
-  g_test_add_func ("/language/get_system_language_async", get_system_language_async);
+  g_test_add_func ("/language/get_valid_system_language", get_valid_system_language);
+  g_test_add_func ("/language/get_valid_system_language_async", get_valid_system_language_async);
+  g_test_add_func ("/language/get_invalid_system_language", get_invalid_system_language);
+  g_test_add_func ("/language/get_invalid_system_language_async", get_invalid_system_language_async);
 
   return g_test_run ();
 }
