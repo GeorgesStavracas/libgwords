@@ -23,6 +23,7 @@ gw_libdir = get_option('libdir')
 gw_libdir_abs = join_paths(gw_prefix, gw_libdir)
 gw_datadir = join_paths(get_option('datadir'), 'gwords')
 gw_datadir_abs = join_paths(gw_prefix, gw_datadir)
+gw_icondir = join_paths(gw_prefix, get_option('datadir'), 'icons')
 
 
 ################
