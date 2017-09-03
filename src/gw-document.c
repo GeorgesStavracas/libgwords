@@ -19,8 +19,12 @@
 #include "gw-document.h"
 #include "gw-language.h"
 #include "gw-modifier.h"
+#include "gw-segmenter.h"
 #include "gw-string.h"
+#include "gw-string-editor.h"
 #include "gw-task-helper-private.h"
+
+#include <string.h>
 
 typedef struct
 {
@@ -309,12 +313,87 @@ gw_document_modify_sync (GwDocument    *self,
                          GCancellable  *cancellable,
                          GError       **error)
 {
+  g_autoptr (GwStringEditor) editor = NULL;
+  GwDocumentPrivate *priv;
+  GwSegmenter *segmenter;
+  GwString *text;
+  gboolean was_word, is_word;
+  gchar *aux, *start, *end;
+  guint64 diff;
+  gsize len;
+
   g_return_val_if_fail (GW_IS_DOCUMENT (self), FALSE);
   g_return_val_if_fail (GW_IS_MODIFIER (modifier), FALSE);
 
-  /* TODO: implement me */
+  priv = gw_document_get_instance_private (self);
+  text = priv->text;
+  segmenter = gw_language_get_segmenter (priv->language);
+  is_word = was_word = FALSE;
+  start = end = NULL;
+  diff = 0;
 
-  return FALSE;
+  /* Don't attempt to segment NULL texts */
+  if (!text)
+    return TRUE;
+
+  aux = text;
+  len = strlen (text);
+
+  editor = gw_string_editor_new (text);
+
+  do
+    {
+      gunichar c;
+
+      c = g_utf8_get_char (aux);
+
+      was_word = is_word;
+      is_word = gw_segmenter_is_word_character (segmenter, c, text - aux, text, len);
+
+      if (!was_word && is_word)
+        {
+          start = aux;
+        }
+      else if (was_word && !is_word)
+        {
+          /* Is it really safe to just assume words won't be bigger than 256 chars? */
+          gchar new_string[256] = { 0, };
+          gchar substring[256];
+          gsize new_size;
+          gsize length;
+
+          end = aux;
+          length = end - start;
+
+          memcpy (substring, start, length);
+          substring[255] = '\0';
+
+          /* Apply the modifier */
+          if (gw_modifier_modify_word (modifier,
+                                       substring,
+                                       length,
+                                       (GStrv) &new_string,
+                                       &new_size))
+            {
+              /* Keep track of the general size difference */
+              diff += new_size - length;
+
+              gw_string_editor_modify (editor,
+                                       text - start + diff,
+                                       text - end + diff,
+                                       new_string, new_size);
+            }
+        }
+
+      aux = g_utf8_next_char (aux);
+    }
+  while (aux && *aux);
+
+  /* Make the edited string the new one */
+  g_clear_pointer (&priv->text, gw_string_unref);
+  priv->text = gw_string_editor_to_string (editor);
+
+  return TRUE;
 }
 
 /**
