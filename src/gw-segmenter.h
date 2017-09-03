@@ -34,6 +34,12 @@ struct _GwSegmenterInterface
 {
   GTypeInterface parent;
 
+  gboolean           (*is_word_character)                        (GwSegmenter        *self,
+                                                                  gunichar            character,
+                                                                  gsize               index,
+                                                                  GwString           *text,
+                                                                  gsize               len);
+
   GStrv              (*segment)                                  (GwSegmenter        *self,
                                                                   GwString           *text,
                                                                   GCancellable       *cancellable,
@@ -41,6 +47,12 @@ struct _GwSegmenterInterface
 };
 
 GwLanguage*          gw_segmenter_get_language                   (GwSegmenter        *self);
+
+gboolean             gw_segmenter_is_word_character              (GwSegmenter        *self,
+                                                                  gunichar            character,
+                                                                  gsize               index,
+                                                                  GwString           *text,
+                                                                  gsize               len);
 
 void                 gw_segmenter_segment                        (GwSegmenter        *self,
                                                                   GwString           *text,

@@ -84,6 +84,40 @@ gw_segmenter_get_language (GwSegmenter *self)
 }
 
 /**
+ * gw_segmenter_is_word_character:
+ * @self: a #GwSegmenter
+ * @character: the current character
+ * @index: the index of @character in @text
+ * @text: a #GwString
+ * @len: length of @text
+ *
+ * Checks if the value of @character at @index is part of a word
+ * or not. This function is used determine the word boundaries
+ * in such a way that is reusable by other methods.
+ *
+ * Returns: %TRUE if @character at @index is part of a word, %FALSE
+ *          if it's outside a word.
+ *
+ * Since: 0.1
+ */
+gboolean
+gw_segmenter_is_word_character (GwSegmenter *self,
+                                gunichar     character,
+                                gsize        index,
+                                GwString    *text,
+                                gsize        len)
+{
+  g_return_val_if_fail (GW_IS_SEGMENTER (self), FALSE);
+  g_return_val_if_fail (GW_SEGMENTER_GET_IFACE (self)->is_word_character, FALSE);
+
+  return GW_SEGMENTER_GET_IFACE (self)->is_word_character (self,
+                                                           character,
+                                                           index,
+                                                           text,
+                                                           len);
+}
+
+/**
  * gw_segmenter_segment:
  * @self: a #GwSegmenter
  * @text: the text to segment

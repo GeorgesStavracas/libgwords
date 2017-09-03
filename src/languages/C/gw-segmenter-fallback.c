@@ -46,6 +46,16 @@ enum
  * GwSegmenter implemntation
  */
 
+static gboolean
+gw_segmenter_fallback_is_word_character (GwSegmenter *self,
+                                         gunichar     character,
+                                         gsize        index,
+                                         GwString    *text,
+                                         gsize        len)
+{
+  return !g_unichar_ispunct (character) && !g_unichar_isspace (character);
+}
+
 static GStrv
 gw_segmenter_fallback_segment (GwSegmenter   *segmenter,
                                GwString      *text,
@@ -55,6 +65,7 @@ gw_segmenter_fallback_segment (GwSegmenter   *segmenter,
   GPtrArray *words;
   gboolean was_word, is_word;
   gchar *aux, *start, *end;
+  gsize len;
 
   g_return_val_if_fail (GW_IS_SEGMENTER_FALLBACK (segmenter), NULL);
 
@@ -68,6 +79,7 @@ gw_segmenter_fallback_segment (GwSegmenter   *segmenter,
     goto out;
 
   aux = text;
+  len = strlen (text);
 
   /*
    * The fallback segmenter is pretty stupid, but it's the best we
@@ -88,11 +100,7 @@ gw_segmenter_fallback_segment (GwSegmenter   *segmenter,
       c = g_utf8_get_char (aux);
 
       was_word = is_word;
-
-      if (g_unichar_ispunct (c) || g_unichar_isspace (c))
-        is_word = FALSE;
-      else
-        is_word = TRUE;
+      is_word = gw_segmenter_is_word_character (segmenter, c, text - aux, text, len);
 
       if (!was_word && is_word)
         {
@@ -126,6 +134,7 @@ out:
 static void
 gw_segmenter_segmenter_iface_init (GwSegmenterInterface *iface)
 {
+  iface->is_word_character = gw_segmenter_fallback_is_word_character;
   iface->segment = gw_segmenter_fallback_segment;
 }
 
