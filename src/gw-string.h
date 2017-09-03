@@ -55,6 +55,8 @@ GwString*            gw_string_new_copy                          (const gchar   
 GwString*            gw_string_new_copy_with_length              (const gchar        *str,
                                                                   gsize               len);
 
+GwString*            gw_string_new_with_size                     (gsize               size);
+
 GwString*            gw_string_ref                               (GwString           *rstr);
 
 GwString*            gw_string_unref                             (GwString           *rstr);

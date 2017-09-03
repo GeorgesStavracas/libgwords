@@ -193,6 +193,35 @@ gw_string_new (const gchar *str)
 }
 
 /**
+ * gw_string_new_with_size:
+ * @size: a size to allocate
+ *
+ * Returns a immutable refcounted string.
+ *
+ * Returns: (transfer full): a #GwString
+ *
+ * Since: 0.1
+ */
+GwString*
+gw_string_new_with_size (gsize size)
+{
+  g_autoptr(GMutexLocker) locker = g_mutex_locker_new (&gw_string_mutex);
+  GwStringHeader *header;
+  GwString *new_string;
+
+  /* create object */
+  header = g_malloc (size + sizeof (GwStringHeader) + 1);
+  header->refcnt = 1;
+
+  new_string = GW_PTR_FROM_HEADER (header);
+  new_string[size] = '\0';
+
+  g_hash_table_add (gw_string_get_hash_safe (), new_string);
+
+  return new_string;
+}
+
+/**
  * gw_string_ref:
  * @rstr: a #GwString
  *
