@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "gconstructor.h"
 #include "gw-extension-points.h"
 #include "gw-init-segmenters.h"
 #include "gw-segmenter.h"
@@ -34,7 +35,14 @@ init_segmenters (void)
 #undef implement_segmenter
 }
 
-__attribute__((constructor))
+
+/* Main constructor */
+#ifdef G_DEFINE_CONSTRUCTOR_NEEDS_PRAGMA
+  #pragma G_DEFINE_CONSTRUCTOR_PRAGMA_ARGS (_gw_init)
+#endif
+
+G_DEFINE_CONSTRUCTOR (_gw_init)
+
 static void
 _gw_init (void)
 {
