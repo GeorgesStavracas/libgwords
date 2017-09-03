@@ -36,6 +36,8 @@ typedef struct       _GwRadixTree                    GwRadixTree;
 typedef struct       _GwSegmenter                    GwSegmenter;
 
 typedef              gchar                           GwString;
+typedef struct       _GwStringEditor                 GwStringEditor;
+
 
 G_END_DECLS
 

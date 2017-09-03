@@ -85,3 +85,16 @@ test_string = executable(
 )
 
 test('test-string', test_string)
+
+
+#################
+# String editor #
+#################
+
+test_string_editor = executable(
+  'test-string-editor',
+  'test-string-editor.c',
+  dependencies: libgwords_dep,
+)
+
+test('test-string-editor', test_string_editor, timeout: 60)
