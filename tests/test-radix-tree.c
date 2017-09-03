@@ -62,7 +62,7 @@ radix_tree_n_entries (guint n)
 
   tree = gw_radix_tree_new ();
   sum = 0;
-  n_iterations = 10000000 / n;
+  n_iterations = 1000000 / n;
 
   for (i = 0; i < n_iterations; i++)
     {
@@ -101,8 +101,7 @@ radix_tree_many_entries (void)
     10,
     1000,
     100000,
-    1000000,
-    10000000
+    1000000
   };
 
   g_print ("\n");
