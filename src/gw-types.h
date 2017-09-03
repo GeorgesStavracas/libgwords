@@ -24,9 +24,15 @@
 G_BEGIN_DECLS
 
 typedef struct       _GwDictionary                   GwDictionary;
+
 typedef struct       _GwLanguage                     GwLanguage;
+
+typedef struct       _GwModifier                     GwModifier;
+
 typedef struct       _GwRadixTree                    GwRadixTree;
+
 typedef struct       _GwSegmenter                    GwSegmenter;
+
 typedef              gchar                           GwString;
 
 G_END_DECLS
