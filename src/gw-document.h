@@ -51,10 +51,10 @@ void                 gw_document_modify                          (GwDocument    
                                                                   GAsyncReadyCallback callback,
                                                                   gpointer            user_data);
 
-GwDocument*          gw_document_modify_finish                   (GAsyncResult       *result,
+gboolean             gw_document_modify_finish                   (GAsyncResult       *result,
                                                                   GError            **error);
 
-GwDocument*          gw_document_modify_sync                     (GwDocument         *self,
+gboolean             gw_document_modify_sync                     (GwDocument         *self,
                                                                   GwModifier         *modifier,
                                                                   GCancellable       *cancellable,
                                                                   GError            **error);

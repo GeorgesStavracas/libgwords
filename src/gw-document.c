@@ -49,15 +49,16 @@ modify_in_thread_cb (GTask        *task,
                      gpointer      task_data,
                      GCancellable *cancellable)
 {
-  GwDocument *self, *new_document;
+  GwDocument *self;
   GwModifier *modifier;
   GError *error;
+  gboolean result;
 
   self = source_object;
   modifier = task_data;
   error = NULL;
 
-  new_document = gw_document_modify_sync (self, modifier, cancellable, &error);
+  result = gw_document_modify_sync (self, modifier, cancellable, &error);
 
   if (error)
     {
@@ -65,7 +66,7 @@ modify_in_thread_cb (GTask        *task,
       return;
     }
 
-  g_task_return_pointer (task, g_object_ref (new_document), g_object_unref);
+  g_task_return_boolean (task, result);
 }
 
 
@@ -272,18 +273,19 @@ gw_document_modify (GwDocument          *self,
  *
  * Finishes the operation started by gw_document_modify().
  *
- * Returns: (transfer full): a #GwDocument with the modified contents.
+ * Returns: %TRUE if the modification was successfull, %FALSE
+ *          otherwise.
  *
  * Since: 0.1.0
  */
-GwDocument*
+gboolean
 gw_document_modify_finish (GAsyncResult  *result,
                            GError       **error)
 {
   g_return_val_if_fail (G_IS_TASK (result), FALSE);
   g_return_val_if_fail (!error || !*error, FALSE);
 
-  return g_task_propagate_pointer (G_TASK (result), error);
+  return g_task_propagate_boolean (G_TASK (result), error);
 }
 
 /**
@@ -296,22 +298,23 @@ gw_document_modify_finish (GAsyncResult  *result,
  * Modifies @self using the passed @modifier. A new document is created
  * in the proccess.
  *
- * Returns: (transfer full): a #GwDocument with the modified contents.
+ * Returns: %TRUE if the modification was successfull, %FALSE
+ *          otherwise.
  *
  * Since: 0.1.0
  */
-GwDocument*
+gboolean
 gw_document_modify_sync (GwDocument    *self,
                          GwModifier    *modifier,
                          GCancellable  *cancellable,
                          GError       **error)
 {
-  g_return_val_if_fail (GW_IS_DOCUMENT (self), NULL);
-  g_return_val_if_fail (GW_IS_MODIFIER (modifier), NULL);
+  g_return_val_if_fail (GW_IS_DOCUMENT (self), FALSE);
+  g_return_val_if_fail (GW_IS_MODIFIER (modifier), FALSE);
 
   /* TODO: implement me */
 
-  return NULL;
+  return FALSE;
 }
 
 /**
