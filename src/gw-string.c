@@ -94,7 +94,8 @@ gw_string_destructor (void)
  * Since: 0.6.6
  */
 GwString*
-gw_string_new_copy_with_length (const gchar *str, gsize len)
+gw_string_new_copy_with_length (const gchar *str,
+                                gsize        len)
 {
   g_autoptr(GMutexLocker) locker = g_mutex_locker_new (&gw_string_mutex);
   GwStringHeader *hdr;
@@ -146,7 +147,8 @@ gw_string_new_copy (const gchar *str)
  * Since: 0.6.6
  */
 GwString *
-gw_string_new_with_length (const gchar *str, gsize len)
+gw_string_new_with_length (const gchar *str,
+                           gsize        len)
 {
   GwStringHeader *hdr;
   g_autoptr(GMutexLocker) locker = g_mutex_locker_new (&gw_string_mutex);
@@ -269,7 +271,8 @@ gw_string_unref (GwString *rstr)
  * Since: 0.6.6
  */
 void
-gw_string_assign (GwString **rstr_ptr, GwString *rstr)
+gw_string_assign (GwString **rstr_ptr,
+                  GwString  *rstr)
 {
   g_return_if_fail (rstr_ptr != NULL);
 
@@ -300,7 +303,8 @@ gw_string_assign (GwString **rstr_ptr, GwString *rstr)
  * Since: 0.6.6
  */
 void
-gw_string_assign_safe (GwString **rstr_ptr, const gchar *str)
+gw_string_assign_safe (GwString    **rstr_ptr,
+                       const gchar  *str)
 {
   g_return_if_fail (rstr_ptr != NULL);
 
@@ -315,7 +319,8 @@ gw_string_assign_safe (GwString **rstr_ptr, const gchar *str)
 }
 
 static gint
-gw_string_sort_by_refcnt_cb (gconstpointer a, gconstpointer b)
+gw_string_sort_by_refcnt_cb (gconstpointer a,
+                             gconstpointer b)
 {
   GwStringHeader *hdr1 = GW_PTR_TO_HEADER (a);
   GwStringHeader *hdr2 = GW_PTR_TO_HEADER (b);
