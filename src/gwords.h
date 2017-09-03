@@ -28,6 +28,7 @@ G_BEGIN_DECLS
 # include "gw-extension-points.h"
 # include "gw-group.h"
 # include "gw-language.h"
+# include "gw-modifier.h"
 # include "gw-radix-tree.h"
 # include "gw-segmenter.h"
 # include "gw-string.h"
