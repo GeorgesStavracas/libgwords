@@ -46,8 +46,8 @@ void                 gw_string_editor_delete                     (GwStringEditor
                                                                   gsize              length);
 
 void                 gw_string_editor_modify                     (GwStringEditor    *self,
-                                                                  gsize              position,
-                                                                  gsize              length,
+                                                                  gsize              start,
+                                                                  gsize              end,
                                                                   GwString          *new_text,
                                                                   gsize              text_len);
 

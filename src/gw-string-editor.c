@@ -682,15 +682,14 @@ gw_string_editor_delete (GwStringEditor *self,
  */
 void
 gw_string_editor_modify (GwStringEditor *self,
-                         guint64         start,
-                         guint64         end,
+                         gsize           start,
+                         gsize           end,
                          GwString       *new_text,
-                         guint64         text_len)
+                         gsize           text_len)
 {
   RopeNode *n;
   gint64 length, diff;
   gint64 offset;
-
 
   g_return_if_fail (self);
   g_return_if_fail (end >= start);
