@@ -8,6 +8,7 @@ deps = [
 libgwords_headers = [
   'gwords.h',
   'gw-dictionary.h',
+  'gw-document.h',
   'gw-extension-points.h',
   'gw-group.h',
   'gw-language.h',
@@ -20,9 +21,11 @@ libgwords_headers = [
 ]
 
 libgwords_sources = files(
+  'languages/C/gw-document-fallback.c',
   'languages/C/gw-segmenter-fallback.c',
   'languages/pt_BR/gw-segmenter-pt-br.c',
   'gw-dictionary.c',
+  'gw-document.c',
   'gw-group.c',
   'gw-init.c',
   'gw-language.c',
@@ -30,6 +33,7 @@ libgwords_sources = files(
   'gw-radix-tree.c',
   'gw-segmenter.c',
   'gw-string.c',
+  'gw-task-helper.c',
   'gw-utils.c',
 )
 

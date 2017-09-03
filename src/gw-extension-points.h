@@ -24,6 +24,7 @@
 G_BEGIN_DECLS
 
 #define GW_EXTENSION_POINT_SEGMENTER         "gw-segmenter-ep"
+#define GW_EXTENSION_POINT_DOCUMENT          "gw-document-ep"
 
 G_END_DECLS
 

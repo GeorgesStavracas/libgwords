@@ -1,4 +1,4 @@
-/* gw-language.h
+/* gw-document.h
  *
  * Copyright (C) 2017 Georges Basile Stavracas Neto <georges.stavracas@gmail.com>
  *
@@ -16,69 +16,62 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GW_LANGUAGE_H
-#define GW_LANGUAGE_H
+#ifndef GW_DOCUMENT_H
+#define GW_DOCUMENT_H
 
 #include "gw-types.h"
 
 #include <gio/gio.h>
-#include <glib.h>
 #include <glib-object.h>
 
 G_BEGIN_DECLS
 
-/**
- * GwLanguageError:
- * @GW_LANGUAGE_ERROR_INVALID: indicated an invalid language
- *
- * Errors that #GwLanguage can generate.
- */
-typedef enum
+#define GW_TYPE_DOCUMENT (gw_document_get_type())
+
+G_DECLARE_DERIVABLE_TYPE (GwDocument, gw_document, GW, DOCUMENT, GObject)
+
+struct _GwDocumentClass
 {
-  GW_LANGUAGE_ERROR_INVALID,
-} GwLanguageError;
+  GObjectClass        parent;
 
-#define GW_LANGUAGE_ERROR (gw_language_error_quark ())
+  GwString*          (*realize)                                  (GwDocument         *self,
+                                                                  GCancellable       *cancellable,
+                                                                  GError            **error);
 
-#define GW_TYPE_LANGUAGE (gw_language_get_type())
+  gpointer            _reserved[20];
+};
 
-G_DECLARE_FINAL_TYPE (GwLanguage, gw_language, GW, LANGUAGE, GObject)
+GwLanguage*          gw_document_get_language                    (GwDocument         *self);
 
-GQuark               gw_language_error_quark                     (void);
+GwString*            gw_document_get_text                        (GwDocument         *self);
 
-void                 gw_language_create_document                 (GwLanguage         *self,
-                                                                  GwString           *text,
+void                 gw_document_modify                          (GwDocument         *self,
+                                                                  GwModifier         *modifier,
                                                                   GCancellable       *cancellable,
                                                                   GAsyncReadyCallback callback,
                                                                   gpointer            user_data);
 
-GwDocument*          gw_language_create_document_finish          (GAsyncResult       *result,
+GwDocument*          gw_document_modify_finish                   (GAsyncResult       *result,
                                                                   GError            **error);
 
-GwDocument*          gw_language_create_document_sync            (GwLanguage         *self,
-                                                                  GwString           *text,
+GwDocument*          gw_document_modify_sync                     (GwDocument         *self,
+                                                                  GwModifier         *modifier,
                                                                   GCancellable       *cancellable,
                                                                   GError            **error);
 
-void                 gw_language_new                             (const gchar        *language,
+void                 gw_document_realize                         (GwDocument         *self,
                                                                   GCancellable       *cancellable,
                                                                   GAsyncReadyCallback callback,
                                                                   gpointer            user_data);
 
-GwLanguage*          gw_language_new_finish                      (GAsyncResult       *result,
+GwString*            gw_document_realize_finish                  (GAsyncResult       *result,
                                                                   GError            **error);
 
-GwLanguage*          gw_language_new_sync                        (const gchar        *language,
+GwString*            gw_document_realize_sync                    (GwDocument         *self,
                                                                   GCancellable       *cancellable,
                                                                   GError            **error);
-
-const gchar*         gw_language_get_language_code               (GwLanguage         *self);
-
-GwSegmenter*         gw_language_get_segmenter                   (GwLanguage         *self);
-
-GwDictionary*        gw_language_get_dictionary                  (GwLanguage         *self);
 
 G_END_DECLS
 
-#endif /* GW_LANGUAGE_H */
+#endif /* GW_DOCUMENT_H */
 

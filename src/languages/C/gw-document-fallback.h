@@ -1,4 +1,4 @@
-/* gw-types.h
+/* gw-document-fallback.h
  *
  * Copyright (C) 2017 Georges Basile Stavracas Neto <georges.stavracas@gmail.com>
  *
@@ -16,27 +16,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GW_TYPES_H
-#define GW_TYPES_H
+#ifndef GW_DOCUMENT_FALLBACK_H
+#define GW_DOCUMENT_FALLBACK_H
 
-#include <glib.h>
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 
-typedef struct       _GwDictionary                   GwDictionary;
+#define GW_TYPE_DOCUMENT_FALLBACK (gw_document_fallback_get_type())
 
-typedef struct       _GwDocument                     GwDocument;
-
-typedef struct       _GwLanguage                     GwLanguage;
-
-typedef struct       _GwModifier                     GwModifier;
-
-typedef struct       _GwRadixTree                    GwRadixTree;
-
-typedef struct       _GwSegmenter                    GwSegmenter;
-
-typedef              gchar                           GwString;
+G_DECLARE_FINAL_TYPE (GwDocumentFallback, gw_document_fallback, GW, DOCUMENT_FALLBACK, GwDocument)
 
 G_END_DECLS
 
-#endif /* GW_TYPES_H */
+#endif /* GW_DOCUMENT_FALLBACK_H */
+

@@ -25,6 +25,7 @@ G_BEGIN_DECLS
 
 #define GW_INSIDE
 # include "gw-dictionary.h"
+# include "gw-document.h"
 # include "gw-extension-points.h"
 # include "gw-group.h"
 # include "gw-language.h"

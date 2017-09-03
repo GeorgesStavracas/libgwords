@@ -1,4 +1,4 @@
-/* gw-types.h
+/* gw-task-helper.c
  *
  * Copyright (C) 2017 Georges Basile Stavracas Neto <georges.stavracas@gmail.com>
  *
@@ -16,27 +16,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GW_TYPES_H
-#define GW_TYPES_H
+#include "gw-task-helper-private.h"
 
-#include <glib.h>
+void
+gw_task_helper_run (gpointer             object,
+                    gpointer             task_data,
+                    GDestroyNotify       task_data_free,
+                    GTaskThreadFunc      thread_func,
+                    GCancellable        *cancellable,
+                    GAsyncReadyCallback  callback,
+                    gpointer             user_data)
+{
 
-G_BEGIN_DECLS
+  GTask *task;
 
-typedef struct       _GwDictionary                   GwDictionary;
+  task = g_task_new (object, cancellable, callback, user_data);
 
-typedef struct       _GwDocument                     GwDocument;
+  if (task_data)
+    g_task_set_task_data (task, task_data, task_data_free);
 
-typedef struct       _GwLanguage                     GwLanguage;
-
-typedef struct       _GwModifier                     GwModifier;
-
-typedef struct       _GwRadixTree                    GwRadixTree;
-
-typedef struct       _GwSegmenter                    GwSegmenter;
-
-typedef              gchar                           GwString;
-
-G_END_DECLS
-
-#endif /* GW_TYPES_H */
+  g_task_run_in_thread (task, thread_func);
+}

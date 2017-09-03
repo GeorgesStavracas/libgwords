@@ -17,15 +17,40 @@
  */
 
 #include "gconstructor.h"
+#include "gw-document.h"
 #include "gw-extension-points.h"
-#include "gw-init-segmenters.h"
 #include "gw-segmenter.h"
+
+#include "gw-init-documents.h"
+#include "gw-init-segmenters.h"
 
 #include <gio/gio.h>
 
 static void
+init_documents (void)
+{
+  GIOExtensionPoint *extension_point;
+
+  /* Extension point for GwSegmenter */
+  extension_point = g_io_extension_point_register (GW_EXTENSION_POINT_DOCUMENT);
+  g_io_extension_point_set_required_type (extension_point, GW_TYPE_DOCUMENT);
+
+#define implement_document(T,lang,priority) g_io_extension_point_implement (GW_EXTENSION_POINT_DOCUMENT, T, lang, priority)
+
+  implement_document (GW_TYPE_DOCUMENT_FALLBACK, "fallback", 10);
+
+#undef implement_document
+}
+
+
+static void
 init_segmenters (void)
 {
+  GIOExtensionPoint *extension_point;
+
+  /* Extension point for GwSegmenter */
+  extension_point = g_io_extension_point_register (GW_EXTENSION_POINT_SEGMENTER);
+  g_io_extension_point_set_required_type (extension_point, GW_TYPE_SEGMENTER);
 
 #define implement_segmenter(T,lang,priority) g_io_extension_point_implement (GW_EXTENSION_POINT_SEGMENTER, T, lang, priority)
 
@@ -34,7 +59,6 @@ init_segmenters (void)
 
 #undef implement_segmenter
 }
-
 
 /* Main constructor */
 #ifdef G_DEFINE_CONSTRUCTOR_NEEDS_PRAGMA
@@ -46,11 +70,6 @@ G_DEFINE_CONSTRUCTOR (_gw_init)
 static void
 _gw_init (void)
 {
-  GIOExtensionPoint *extension_point;
-
-  /* Extension point for GwSegmenter */
-  extension_point = g_io_extension_point_register (GW_EXTENSION_POINT_SEGMENTER);
-  g_io_extension_point_set_required_type (extension_point, GW_TYPE_SEGMENTER);
-
+  init_documents ();
   init_segmenters ();
 }

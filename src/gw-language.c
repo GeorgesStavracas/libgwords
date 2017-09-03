@@ -20,7 +20,9 @@
 #include "gw-extension-points.h"
 #include "gw-language.h"
 #include "gw-radix-tree.h"
+#include "gw-string.h"
 #include "gw-segmenter.h"
+#include "gw-task-helper-private.h"
 #include "gw-utils.h"
 
 struct _GwLanguage
@@ -31,6 +33,8 @@ struct _GwLanguage
 
   GwSegmenter        *segmenter;
   GwDictionary       *dictionary;
+
+  GType               document_gtype;
 
   GError             *init_error;
   gboolean            valid : 1;
@@ -53,6 +57,35 @@ enum
 
 static GParamSpec *properties [N_PROPS] = { NULL, };
 
+
+/*
+ * GTask thread functions
+ */
+static void
+create_document_in_thread_cb (GTask        *task,
+                              gpointer      source_object,
+                              gpointer      task_data,
+                              GCancellable *cancellable)
+{
+  GwLanguage *self;
+  GwDocument *document;
+  GwString *text;
+  GError *error;
+
+  self = source_object;
+  text = task_data;
+  error = NULL;
+
+  document = gw_language_create_document_sync (self, text, cancellable, &error);
+
+  if (error)
+    {
+      g_task_return_error (task, error);
+      return;
+    }
+
+  g_task_return_pointer (task, g_object_ref (document), g_object_unref);
+}
 
 /*
  * Auxiliary methods
@@ -147,6 +180,23 @@ setup_segmenter (GwLanguage *self)
 }
 
 static void
+setup_document (GwLanguage *self)
+{
+  GIOExtensionPoint *extension_point;
+  GIOExtension *document_extension;
+
+  extension_point = g_io_extension_point_lookup (GW_EXTENSION_POINT_DOCUMENT);
+  document_extension = g_io_extension_point_get_extension_by_name (extension_point, self->code);
+
+  if (!document_extension)
+    document_extension = g_io_extension_point_get_extension_by_name (extension_point, "fallback");
+
+  self->document_gtype = g_io_extension_get_type (document_extension);
+
+  g_debug ("Document type: %s", g_type_name (g_io_extension_get_type (document_extension)));
+}
+
+static void
 gw_language_set_language_code_internal (GwLanguage  *self,
                                         const gchar *code)
 {
@@ -175,6 +225,7 @@ gw_language_set_language_code_internal (GwLanguage  *self,
 
   /* Create the various objects */
   setup_dictionary (self);
+  setup_document (self);
   setup_segmenter (self);
 }
 
@@ -324,6 +375,86 @@ GQuark
 gw_language_error_quark (void)
 {
   return g_quark_from_static_string ("Invalid language");
+}
+
+/**
+ * gw_language_create_document:
+ * @self: a #GwDocument
+ * @text: (nullable): a #GwText
+ * @cancellable: (nullable): a #GCancellable
+ * @callback: (scope async): callback called when the operation is finished
+ * @user_data: (closure): user data for @callback
+ *
+ * Asynchronously creates a #GwDocument using @self as the
+ * base language.
+ *
+ * Since: 0.1
+ */
+void
+gw_language_create_document (GwLanguage          *self,
+                             GwString            *text,
+                             GCancellable        *cancellable,
+                             GAsyncReadyCallback  callback,
+                             gpointer             user_data)
+{
+  g_return_if_fail (GW_IS_LANGUAGE (self));
+
+  gw_task_helper_run (self,
+                      text ? gw_string_ref (text) : NULL,
+                      (GDestroyNotify) (text ? gw_string_unref : NULL),
+                      create_document_in_thread_cb,
+                      cancellable,
+                      callback,
+                      user_data);
+}
+
+/**
+ * gw_language_create_document_finish:
+ * @result: a #GAsyncResult
+ * @error: (nullable): return location for a #GError
+ *
+ * Finishes the operation started by gw_language_create_document().
+ *
+ * Returns: a concrete #GwDocument implementation.
+ *
+ * Since: 0.1.0
+ */
+GwDocument*
+gw_language_create_document_finish (GAsyncResult  *result,
+                                    GError       **error)
+{
+  g_return_val_if_fail (G_IS_TASK (result), FALSE);
+  g_return_val_if_fail (!error || !*error, FALSE);
+
+  return g_task_propagate_pointer (G_TASK (result), error);
+}
+
+/**
+ * gw_language_create_document_sync:
+ * @self: a #GwDocument
+ * @text: (nullable): a #GwText
+ * @cancellable: (nullable): a #GCancellable
+ * @error: (nullable): return location for a #GError
+ *
+ * Synchronously creates a #GwDocument using @self as the
+ * base language.
+ *
+ * Returns: a concrete #GwDocument implementation.
+ *
+ * Since: 0.1
+ */
+GwDocument*
+gw_language_create_document_sync (GwLanguage    *self,
+                                  GwString      *text,
+                                  GCancellable  *cancellable,
+                                  GError       **error)
+{
+  g_return_val_if_fail (GW_IS_LANGUAGE (self), NULL);
+
+  return g_object_new (self->document_gtype,
+                       "language", self,
+                       "text", text,
+                       NULL);
 }
 
 /**
