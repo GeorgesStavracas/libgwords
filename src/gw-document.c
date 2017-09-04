@@ -154,7 +154,8 @@ gw_document_set_property (GObject      *object,
       break;
 
     case PROP_TEXT:
-      priv->text = gw_string_ref ((GwString*) g_value_get_string (value));
+      if (g_value_get_string (value))
+        priv->text = gw_string_new (g_value_get_string (value));
       break;
 
     default:
