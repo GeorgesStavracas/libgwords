@@ -706,15 +706,12 @@ gw_string_editor_modify (GwStringEditor *self,
 
   /* Remove extra space... */
   if (diff < 0)
-    {
-      gw_string_editor_delete (self, start + text_len, -diff);
-      end += diff;
-    }
+    gw_string_editor_delete (self, start + text_len, -diff);
   else if (diff > 0)
-    {
-      gw_string_editor_insert (self, new_text + text_len - diff, end);
-      end -= diff;
-    }
+    gw_string_editor_insert (self, new_text + text_len - diff, end);
+
+  /* Adjust the new end position */
+  end += diff;
 
   /* Just go over the nodes and update the values */
   for (n = &self->head; n; n = n->nexts[0].node)
