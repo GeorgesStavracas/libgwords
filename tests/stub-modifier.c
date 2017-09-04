@@ -58,8 +58,6 @@ stub_modifier_modify_word (GwModifier      *self,
 {
   guint i;
 
-  g_message ("modifying '%s'", word);
-
   for (i = 0; map[i].word; i++)
     {
       if (g_strcmp0 (word, map[i].word) == 0)
