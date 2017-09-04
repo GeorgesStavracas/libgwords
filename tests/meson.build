@@ -36,6 +36,18 @@ test('test-dictionary', test_dictionary)
 
 
 ############
+# Document #
+############
+
+test_document = executable(
+  'test-document',
+  [ 'stub-modifier.c', 'test-document.c' ],
+  dependencies: libgwords_dep,
+)
+
+test('test-document', test_document)
+
+############
 # Language #
 ############
 
