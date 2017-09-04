@@ -30,7 +30,7 @@ document_new (void)
   GError *error;
 
   error = NULL;
-  language = gw_language_new_sync (NULL, NULL, &error);
+  language = gw_language_new_sync ("fallback", NULL, &error);
 
   g_assert_no_error (error);
   g_assert_nonnull (language);
@@ -75,7 +75,7 @@ document_new_async (void)
 
   error = NULL;
   mainloop = g_main_loop_new (NULL, FALSE);
-  language = gw_language_new_sync (NULL, NULL, &error);
+  language = gw_language_new_sync ("fallback", NULL, &error);
 
   g_assert_no_error (error);
   g_assert_nonnull (language);
@@ -101,7 +101,7 @@ document_new_from_string (void)
 
   error = NULL;
   string = gw_string_new ("Questions of science... science and progress.");
-  language = gw_language_new_sync (NULL, NULL, &error);
+  language = gw_language_new_sync ("fallback", NULL, &error);
 
   g_assert_no_error (error);
   g_assert_nonnull (language);
@@ -150,7 +150,7 @@ document_new_from_string_async (void)
   error = NULL;
   string = gw_string_new ("Questions of science... science and progress.");
   mainloop = g_main_loop_new (NULL, FALSE);
-  language = gw_language_new_sync (NULL, NULL, &error);
+  language = gw_language_new_sync ("fallback", NULL, &error);
 
   g_assert_no_error (error);
   g_assert_nonnull (language);
@@ -178,7 +178,7 @@ document_modify (void)
 
   error = NULL;
   string = gw_string_new ("I am a fat computer living in a blue sky. Did you know? Planet in Portuguese is 'planeta'.");
-  language = gw_language_new_sync (NULL, NULL, &error);
+  language = gw_language_new_sync ("fallback", NULL, &error);
 
   g_assert_no_error (error);
   g_assert_nonnull (language);
@@ -241,7 +241,7 @@ document_modify_async (void)
   error = NULL;
   string = gw_string_new ("I am a fat computer living in a blue sky. Did you know? Planet in Portuguese is 'planeta'.");
   mainloop = g_main_loop_new (NULL, FALSE);
-  language = gw_language_new_sync (NULL, NULL, &error);
+  language = gw_language_new_sync ("fallback", NULL, &error);
 
   g_assert_no_error (error);
   g_assert_nonnull (language);
