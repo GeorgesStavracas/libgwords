@@ -358,8 +358,8 @@ gw_document_modify_sync (GwDocument    *self,
       else if (was_word && !is_word)
         {
           /* Is it really safe to just assume words won't be bigger than 256 chars? */
-          gchar new_string[256] = { 0, };
-          gchar substring[256];
+          GwString *new_string;
+          gchar substring[256] = { 0, };
           gsize new_size;
           gsize length;
 
@@ -367,22 +367,24 @@ gw_document_modify_sync (GwDocument    *self,
           length = end - start;
 
           memcpy (substring, start, length);
-          substring[255] = '\0';
 
           /* Apply the modifier */
           if (gw_modifier_modify_word (modifier,
                                        substring,
                                        length,
-                                       (GStrv) &new_string,
+                                       &new_string,
                                        &new_size))
             {
+              gw_string_editor_modify (editor,
+                                       start - text + diff,
+                                       end - text + diff,
+                                       new_string,
+                                       new_size);
+
               /* Keep track of the general size difference */
               diff += new_size - length;
 
-              gw_string_editor_modify (editor,
-                                       text - start + diff,
-                                       text - end + diff,
-                                       new_string, new_size);
+              gw_string_unref (new_string);
             }
         }
 
