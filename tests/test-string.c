@@ -52,6 +52,17 @@ static_string_init (void)
 
 /**************************************************************************************************/
 
+static void
+string_printf (void)
+{
+  g_autoptr (GwString) string;
+
+  string = gw_string_new_printf ("I'm %d, %d or even 0x%x!", 1, 2, 0xdeadbeef);
+
+  g_assert_cmpstr (string, ==, "I'm 1, 2 or even 0xdeadbeef!");
+}
+/**************************************************************************************************/
+
 gint
 main (gint   argc,
       gchar *argv[])
@@ -60,6 +71,7 @@ main (gint   argc,
 
   g_test_add_func ("/string/init", string_init);
   g_test_add_func ("/string/static_init", static_string_init);
+  g_test_add_func ("/string/printf", string_printf);
 
   return g_test_run ();
 }

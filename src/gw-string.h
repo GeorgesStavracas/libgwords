@@ -57,6 +57,12 @@ GwString*            gw_string_new_copy_with_length              (const gchar   
 
 GwString*            gw_string_new_with_size                     (gsize               size);
 
+GwString*            gw_string_new_vprintf                       (const gchar        *format,
+                                                                  va_list             args);
+
+GwString*            gw_string_new_printf                        (const gchar        *format,
+                                                                  ...) G_GNUC_PRINTF (1, 2);
+
 GwString*            gw_string_ref                               (GwString           *rstr);
 
 GwString*            gw_string_unref                             (GwString           *rstr);

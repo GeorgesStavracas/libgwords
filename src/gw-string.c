@@ -27,9 +27,10 @@
  * These functions are used to implement refcounted C strings.
  */
 
-#include <string.h>
-
 #include "gw-string.h"
+
+#include <glib.h>
+#include <string.h>
 
 typedef struct
 {
@@ -67,6 +68,22 @@ static void __attribute__ ((destructor))
 gw_string_destructor (void)
 {
   g_clear_pointer (&gw_string_hash, g_hash_table_unref);
+}
+
+GwString*
+new_string_from_size (gsize size)
+{
+  GwStringHeader *header;
+  GwString *new_string;
+
+  /* create object */
+  header = g_malloc (size + sizeof (GwStringHeader) + 1);
+  header->refcnt = 1;
+
+  new_string = GW_PTR_FROM_HEADER (header);
+  new_string[size] = '\0';
+
+  return new_string;
 }
 
 /**
@@ -182,7 +199,7 @@ gw_string_new_with_length (const gchar *str,
  *
  * Returns: a %GwString
  *
- * Since: 0.6.6
+ * Since: 0.1
  */
 GwString *
 gw_string_new (const gchar *str)
@@ -206,17 +223,79 @@ GwString*
 gw_string_new_with_size (gsize size)
 {
   g_autoptr(GMutexLocker) locker = g_mutex_locker_new (&gw_string_mutex);
-  GwStringHeader *header;
   GwString *new_string;
 
   /* create object */
-  header = g_malloc (size + sizeof (GwStringHeader) + 1);
-  header->refcnt = 1;
-
-  new_string = GW_PTR_FROM_HEADER (header);
-  new_string[size] = '\0';
+  new_string = new_string_from_size (size);
 
   g_hash_table_add (gw_string_get_hash_safe (), new_string);
+
+  return new_string;
+}
+
+/**
+ * gw_string_new_vprintf:
+ * @format: a standard printf() format string
+ * @args: the list of arguments to insert in the output
+ *
+ * Returns a immutable refcounted string formatted according
+ * to @format.
+ *
+ * Returns: (transfer full): a #GwString
+ *
+ * Since: 0.1
+ */
+GwString*
+gw_string_new_vprintf (const gchar *format,
+                       va_list      args)
+{
+  g_autoptr (GMutexLocker) locker = g_mutex_locker_new (&gw_string_mutex);
+  GwString *new_string;
+  va_list copy;
+  gsize str_size;
+
+  va_copy (copy, args);
+
+  str_size = g_printf_string_upper_bound (format, args);
+  new_string = new_string_from_size (str_size);
+
+  g_vsnprintf (new_string, str_size, format, copy);
+
+  return new_string;
+}
+
+/**
+ * gw_string_new_printf:
+ * @format: a standard printf() format string.
+ * @...: the arguments to insert in the output.
+ *
+ * Returns a immutable refcounted string formatted according
+ * to @format.
+ *
+ * Returns: (transfer full): a #GwString
+ *
+ * Since: 0.1
+ */
+GwString*
+gw_string_new_printf (const gchar *format,
+                      ...)
+{
+  g_autoptr (GMutexLocker) locker = g_mutex_locker_new (&gw_string_mutex);
+  GwString *new_string;
+  va_list args;
+  gsize str_size;
+
+  va_start (args, format);
+
+  str_size = g_printf_string_upper_bound (format, args);
+  new_string = new_string_from_size (str_size);
+
+  va_end (args);
+  va_start (args, format);
+
+  g_vsnprintf (new_string, str_size, format, args);
+
+  va_end (args);
 
   return new_string;
 }
