@@ -13,6 +13,7 @@ gw_major_version = varr[0]
 gw_minor_version = varr[1]
 gw_micro_version = varr[2]
 
+gw_versioned_name = 'gwords-@0@'.format(gw_major_version)
 
 ###############
 # Directories #
@@ -21,7 +22,7 @@ gw_micro_version = varr[2]
 gw_prefix = get_option('prefix')
 gw_libdir = get_option('libdir')
 gw_libdir_abs = join_paths(gw_prefix, gw_libdir)
-gw_datadir = join_paths(get_option('datadir'), 'gwords')
+gw_datadir = join_paths(get_option('datadir'), gw_versioned_name)
 gw_datadir_abs = join_paths(gw_prefix, gw_datadir)
 gw_icondir = join_paths(gw_prefix, get_option('datadir'), 'icons')
 
@@ -50,6 +51,7 @@ conf.set_quoted('PACKAGE_VERSION', gw_version)
 conf.set_quoted('GETTEXT_PACKAGE', meson.project_name())
 conf.set_quoted('LOCALEDIR', get_option('localedir'))
 conf.set_quoted('LOCALSTATEDIR', get_option('localstatedir'))
+conf.set_quoted('GW_PACKAGE_NAME', gw_versioned_name)
 
 configure_file(
          output: 'config.h',

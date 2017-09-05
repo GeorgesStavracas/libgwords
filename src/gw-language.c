@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "config.h"
 #include "gw-dictionary.h"
 #include "gw-extension-points.h"
 #include "gw-language.h"
@@ -133,7 +134,7 @@ setup_dictionary (GwLanguage *self)
   g_autofree gchar *user_data_dir;
 
   /* Try 1: g_get_user_data_dir */
-  user_data_dir = g_build_filename (g_get_user_data_dir (), "gwords", NULL);
+  user_data_dir = g_build_filename (g_get_user_data_dir (), GW_PACKAGE_NAME, NULL);
 
   if (load_dictionary_file_at_path (self, user_data_dir))
     goto out;
@@ -147,7 +148,7 @@ setup_dictionary (GwLanguage *self)
       const gchar *datadir;
 
       datadir = *system_data_dirs;
-      real_datadir = g_build_filename (datadir, "gwords", NULL);
+      real_datadir = g_build_filename (datadir, GW_PACKAGE_NAME, NULL);
 
       if (load_dictionary_file_at_path (self, real_datadir))
         goto out;

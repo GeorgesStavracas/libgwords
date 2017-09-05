@@ -53,7 +53,7 @@ version_data.set('MICRO_VERSION', gw_micro_version)
 configure_file(
           input: 'gw-version.h.in',
          output: 'gw-version.h',
-    install_dir: join_paths(get_option('prefix'), get_option('includedir'), 'gwords'),
+    install_dir: join_paths(get_option('prefix'), get_option('includedir'), gw_versioned_name),
   configuration: version_data
 )
 
@@ -63,13 +63,13 @@ configure_file(
 #############
 
 libgwords = shared_library(
-              'gwords-' + gw_major_version,
+              gw_versioned_name,
               sources: libgwords_sources,
             soversion: gw_major_version,
               version: gw_major_version,
           install_dir: gw_libdir,
         install_rpath: gw_libdir_abs,
-  include_directories: include_directories('.'),
+  include_directories: [ include_directories('.'), include_directories('..') ],
          dependencies: deps,
               install: true
 )
@@ -92,9 +92,10 @@ pkgg = import('pkgconfig')
 pkgg.generate(
          name: 'libgwords',
   description: 'Natural Language Text Management for GNOME',
-     filebase: 'gwords-' + gw_major_version,
+     filebase: gw_versioned_name,
       version: gw_version,
-    libraries: libgwords,
+    libraries: [ libgwords ],
+      subdirs: gw_versioned_name,
      requires: ['glib-2.0', 'gobject-2.0', 'gio-2.0'],
   install_dir: join_paths(gw_libdir, 'pkgconfig')
 )
