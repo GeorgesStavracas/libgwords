@@ -1,4 +1,4 @@
-libgwords_headers_dir = join_paths(gw_prefix, get_option('includedir'), 'gwords')
+libgwords_headers_dir = join_paths(gw_prefix, get_option('includedir'), gw_versioned_name)
 
 deps = [
   glib_dep,
