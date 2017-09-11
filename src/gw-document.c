@@ -319,6 +319,8 @@ gw_document_modify_sync (GwDocument    *self,
   GwSegmenter *segmenter;
   GwString *text;
   gboolean was_word, is_word;
+  gboolean last_finished;
+  gboolean valid;
   gchar *aux, *start, *end;
   guint64 diff;
   gsize len;
@@ -330,6 +332,8 @@ gw_document_modify_sync (GwDocument    *self,
   text = priv->text;
   segmenter = gw_language_get_segmenter (priv->language);
   is_word = was_word = FALSE;
+  last_finished = FALSE;
+  valid = TRUE;
   start = end = NULL;
   diff = 0;
 
@@ -388,9 +392,21 @@ gw_document_modify_sync (GwDocument    *self,
             }
         }
 
-      aux = g_utf8_next_char (aux);
+      /*
+       * HACK!!!
+       *
+       * This should be implemented as a ordered tree of word, which is realized
+       * when the modification is finished. The code deals with it for now, but
+       * it should ~really~ change soon.
+       */
+      if (aux && *aux)
+        aux = g_utf8_next_char (aux);
+      else
+        last_finished = TRUE;
+
+      valid = (aux && *aux) || !last_finished;
     }
-  while (aux && *aux);
+  while (valid);
 
   /* Make the edited string the new one */
   g_clear_pointer (&priv->text, gw_string_unref);
