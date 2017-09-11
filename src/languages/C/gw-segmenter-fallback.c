@@ -53,7 +53,7 @@ gw_segmenter_fallback_is_word_character (GwSegmenter *self,
                                          GwString    *text,
                                          gsize        len)
 {
-  return !g_unichar_ispunct (character) && !g_unichar_isspace (character);
+  return character != '\0' && !g_unichar_ispunct (character) && !g_unichar_isspace (character);
 }
 
 static GStrv
