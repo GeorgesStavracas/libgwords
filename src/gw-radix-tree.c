@@ -1318,6 +1318,7 @@ gw_radix_tree_lookup (GwRadixTree *self,
 {
   Node **child;
   Node *n;
+  Leaf *l;
   gint depth;
 
   g_return_val_if_fail (self, NULL);
@@ -1328,6 +1329,8 @@ gw_radix_tree_lookup (GwRadixTree *self,
   if (key_length == -1)
     key_length = strlen (key);
 
+  l = NULL;
+
   while (n)
     {
       if (IS_LEAF (n))
@@ -1335,9 +1338,9 @@ gw_radix_tree_lookup (GwRadixTree *self,
           n = (Node*) LEAF_RAW (n);
 
           if (leaf_matches ((Leaf*) n, (guchar*) key, key_length))
-            return ((Leaf*) n)->value;
+            l = (Leaf*) n;
 
-          return NULL;
+          break;
         }
 
       /* Bail if the prefix does not match */
@@ -1348,7 +1351,10 @@ gw_radix_tree_lookup (GwRadixTree *self,
           prefix_len = check_prefix (n, (guchar*) key, key_length, depth);
 
           if (prefix_len != MIN (MAX_PREFIX_LEN, n->partial_len))
-            return NULL;
+            {
+              l = NULL;
+              break;
+            }
 
           depth = depth + n->partial_len;
         }
@@ -1359,7 +1365,11 @@ gw_radix_tree_lookup (GwRadixTree *self,
       depth++;
     }
 
-  return NULL;
+
+  if (found)
+    *found = l != NULL;
+
+  return l ? l->value : NULL;
 }
 
 /**
