@@ -19,6 +19,10 @@
 #ifndef GW_DOCUMENT_H
 #define GW_DOCUMENT_H
 
+#if !defined(GW_INSIDE) && !defined(GW_COMPILATION)
+# error "Only <gwords.h> can be included directly."
+#endif
+
 #include "gw-types.h"
 
 #include <gio/gio.h>

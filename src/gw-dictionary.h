@@ -19,6 +19,10 @@
 #ifndef GW_DICTIONARY_H
 #define GW_DICTIONARY_H
 
+#if !defined(GW_INSIDE) && !defined(GW_COMPILATION)
+# error "Only <gwords.h> can be included directly."
+#endif
+
 #include <glib-object.h>
 #include <gio/gio.h>
 

@@ -25,12 +25,7 @@ G_BEGIN_DECLS
 
 #define GW_TYPE_RADIX_TREE (gw_radix_tree_get_type())
 
-G_DECLARE_DERIVABLE_TYPE (GwRadixTree, gw_radix_tree, GW, RADIX_TREE, GObject)
-
-struct _GwRadixTreeClass
-{
-  GObjectClass        parent;
-};
+typedef struct _GwRadixTree GwRadixTree;
 
 #define GW_RADIX_TREE_ITER_STOP     TRUE
 #define GW_RADIX_TREE_ITER_CONTINUE FALSE
@@ -43,45 +38,55 @@ typedef gboolean     (*RadixTreeCb)                               (const gchar  
                                                                    gpointer           value,
                                                                    gpointer           user_data);
 
+GType                gw_radix_tree_get_type                      (void) G_GNUC_CONST;
+
 GwRadixTree*         gw_radix_tree_new                           (void);
+
+GwRadixTree*         gw_radix_tree_copy                          (GwRadixTree        *self);
+
+GwRadixTree*         gw_radix_tree_ref                           (GwRadixTree        *self);
+
+void                 gw_radix_tree_unref                         (GwRadixTree        *self);
 
 GwRadixTree*         gw_radix_tree_new_with_free_func            (GDestroyNotify      destroy_func);
 
-gboolean             gw_radix_tree_contains                      (GwRadixTree     *tree,
+gboolean             gw_radix_tree_contains                      (GwRadixTree        *tree,
                                                                   const gchar        *key,
                                                                   gsize               key_length);
 
-gpointer             gw_radix_tree_lookup                        (GwRadixTree     *tree,
+gpointer             gw_radix_tree_lookup                        (GwRadixTree        *tree,
                                                                   const gchar        *key,
                                                                   gsize               key_length,
                                                                   gboolean           *found);
 
-gboolean             gw_radix_tree_insert                        (GwRadixTree     *tree,
+gboolean             gw_radix_tree_insert                        (GwRadixTree        *tree,
                                                                   const gchar        *key,
                                                                   gsize               key_length,
                                                                   gpointer            value);
 
-void                 gw_radix_tree_clear                         (GwRadixTree     *tree);
+void                 gw_radix_tree_clear                         (GwRadixTree        *tree);
 
-gint                 gw_radix_tree_get_size                      (GwRadixTree     *tree);
+gint                 gw_radix_tree_get_size                      (GwRadixTree        *tree);
 
-gboolean             gw_radix_tree_iter                          (GwRadixTree     *tree,
+gboolean             gw_radix_tree_iter                          (GwRadixTree        *tree,
                                                                   RadixTreeCb         callback,
                                                                   gpointer            user_data);
 
-GStrv                gw_radix_tree_get_keys                      (GwRadixTree     *tree);
+GStrv                gw_radix_tree_get_keys                      (GwRadixTree        *tree);
 
-GPtrArray*           gw_radix_tree_get_values                    (GwRadixTree     *tree);
+GPtrArray*           gw_radix_tree_get_values                    (GwRadixTree        *tree);
 
-void                 gw_radix_tree_remove                        (GwRadixTree     *tree,
+void                 gw_radix_tree_remove                        (GwRadixTree        *tree,
                                                                   const gchar        *key,
                                                                   gsize               key_length);
 
-void                 gw_radix_tree_steal                         (GwRadixTree     *tree,
+void                 gw_radix_tree_steal                         (GwRadixTree        *tree,
                                                                   const gchar        *key,
                                                                   gsize               key_length);
+
+
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (GwRadixTree, gw_radix_tree_unref)
 
 G_END_DECLS
 
 #endif /* GW_RADIX_TREE_H */
-

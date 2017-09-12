@@ -25,11 +25,9 @@
 static void
 radix_tree_init (void)
 {
-  GwRadixTree *tree;
+  g_autoptr (GwRadixTree) tree;
 
   tree = gw_radix_tree_new ();
-
-  g_clear_object (&tree);
 }
 
 /**************************************************************************************************/
@@ -37,7 +35,7 @@ radix_tree_init (void)
 static void
 radix_tree_low_entries (void)
 {
-  GwRadixTree *tree;
+  g_autoptr (GwRadixTree) tree;
 
   tree = gw_radix_tree_new ();
 
@@ -46,8 +44,6 @@ radix_tree_low_entries (void)
   gw_radix_tree_insert (tree, "Test", -1, NULL);
   gw_radix_tree_insert (tree, "Firefox", -1, NULL);
   gw_radix_tree_insert (tree, "Yay", -1, NULL);
-
-  g_clear_object (&tree);
 }
 
 /**************************************************************************************************/
@@ -55,7 +51,7 @@ radix_tree_low_entries (void)
 static void
 radix_tree_n_entries (guint n)
 {
-  GwRadixTree *tree;
+  g_autoptr (GwRadixTree) tree;
   gdouble sum;
   gchar key[20] = { '\0', };
   gint i, n_iterations;
@@ -85,8 +81,6 @@ radix_tree_n_entries (guint n)
 
       sum += spent;
     }
-
-  g_clear_object (&tree);
 
   sum = sum / n_iterations;
 
@@ -128,7 +122,7 @@ iter_cb (const gchar *key,
 static void
 radix_tree_iteration (void)
 {
-  GwRadixTree *tree;
+  g_autoptr (GwRadixTree) tree;
   gint i;
 
   const gchar* entries[] = {
@@ -147,8 +141,6 @@ radix_tree_iteration (void)
     gw_radix_tree_insert (tree, entries[i], -1, NULL);
 
   gw_radix_tree_iter (tree, iter_cb, entries);
-
-  g_clear_object (&tree);
 }
 
 /**************************************************************************************************/
@@ -169,7 +161,7 @@ utf8_iter_cb (const gchar *key,
 static void
 radix_tree_utf8 (void)
 {
-  GwRadixTree *tree;
+  g_autoptr (GwRadixTree) tree;
   gint i;
 
   const gchar* entries[] = {
@@ -187,8 +179,6 @@ radix_tree_utf8 (void)
     gw_radix_tree_insert (tree, entries[i], -1, NULL);
 
   gw_radix_tree_iter (tree, utf8_iter_cb, entries);
-
-  g_clear_object (&tree);
 }
 
 /**************************************************************************************************/
@@ -196,7 +186,7 @@ radix_tree_utf8 (void)
 static void
 radix_tree_get_keys (void)
 {
-  GwRadixTree *tree;
+  g_autoptr (GwRadixTree) tree;
   GStrv keys;
   gint i;
 
@@ -219,7 +209,6 @@ radix_tree_get_keys (void)
   g_assert_cmpuint (g_strv_length (keys), ==, G_N_ELEMENTS (entries));
 
   g_clear_pointer (&keys, g_strfreev);
-  g_clear_object (&tree);
 }
 
 /**************************************************************************************************/
@@ -227,8 +216,8 @@ radix_tree_get_keys (void)
 static void
 radix_tree_get_values (void)
 {
+  g_autoptr (GwRadixTree) tree;
   g_autoptr (GPtrArray) values;
-  GwRadixTree *tree;
   gint i;
 
   const gchar* entries[] = {
@@ -248,8 +237,6 @@ radix_tree_get_values (void)
 
   g_assert_nonnull (values);
   g_assert_cmpuint (values->len, ==, G_N_ELEMENTS (entries));
-
-  g_clear_object (&tree);
 }
 
 /**************************************************************************************************/

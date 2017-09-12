@@ -117,23 +117,16 @@ G_STATIC_ASSERT (sizeof (Node16)  == 160);
 G_STATIC_ASSERT (sizeof (Node48)  == 656);
 G_STATIC_ASSERT (sizeof (Node256) == 2064);
 
-typedef struct
+
+struct _GwRadixTree
 {
+  guint               ref_count;
   Node               *root;
   guint64             size;
   GDestroyNotify      destroy_func;
-} GwRadixTreePrivate;
-
-G_DEFINE_TYPE_WITH_PRIVATE (GwRadixTree, gw_radix_tree, G_TYPE_OBJECT)
-
-enum
-{
-  PROP_0,
-  PROP_SIZE,
-  N_PROPS
 };
 
-static GParamSpec *properties [N_PROPS] = { NULL, };
+G_DEFINE_BOXED_TYPE (GwRadixTree, gw_radix_tree, gw_radix_tree_ref, gw_radix_tree_unref)
 
 /*
  * Internal functions
@@ -1180,75 +1173,14 @@ iter_recursive (Node        *n,
 }
 
 static void
-gw_radix_tree_finalize (GObject *object)
+gw_radix_tree_free (GwRadixTree *self)
 {
-  GwRadixTree *self = (GwRadixTree *)object;
-  GwRadixTreePrivate *priv = gw_radix_tree_get_instance_private (self);
+  g_assert (self);
+  g_assert_cmpint (self->ref_count, ==, 0);
 
-  destroy_node_recursive (priv->root);
+  destroy_node_recursive (self->root);
 
-  G_OBJECT_CLASS (gw_radix_tree_parent_class)->finalize (object);
-}
-
-static void
-gw_radix_tree_get_property (GObject    *object,
-                            guint       prop_id,
-                            GValue     *value,
-                            GParamSpec *pspec)
-{
-  GwRadixTree *self = GW_RADIX_TREE (object);
-  GwRadixTreePrivate *priv = gw_radix_tree_get_instance_private (self);
-
-  switch (prop_id)
-    {
-    case PROP_SIZE:
-      g_value_set_uint (value, priv->size);
-      break;
-
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-    }
-}
-
-static void
-gw_radix_tree_set_property (GObject      *object,
-                            guint         prop_id,
-                            const GValue *value,
-                            GParamSpec   *pspec)
-{
-  G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-}
-
-static void
-gw_radix_tree_class_init (GwRadixTreeClass *klass)
-{
-  GObjectClass *object_class = G_OBJECT_CLASS (klass);
-
-  object_class->finalize = gw_radix_tree_finalize;
-  object_class->get_property = gw_radix_tree_get_property;
-  object_class->set_property = gw_radix_tree_set_property;
-
-  /**
-   * GwRadixTree:size:
-   *
-   * The number of elements this tree contains.
-   *
-   * Since: 0.1.0
-   */
-  properties[PROP_SIZE] = g_param_spec_uint ("size",
-                                             "Size of the tree",
-                                             "The number of elements in this tree",
-                                             0,
-                                             G_MAXUINT,
-                                             0,
-                                             G_PARAM_READABLE);
-
-  g_object_class_install_properties (object_class, N_PROPS, properties);
-}
-
-static void
-gw_radix_tree_init (GwRadixTree *self)
-{
+  g_slice_free (GwRadixTree, self);
 }
 
 /**
@@ -1263,7 +1195,56 @@ gw_radix_tree_init (GwRadixTree *self)
 GwRadixTree *
 gw_radix_tree_new (void)
 {
-  return g_object_new (GW_TYPE_RADIX_TREE, NULL);
+  GwRadixTree *self;
+
+  self = g_slice_new0 (GwRadixTree);
+  self->ref_count = 1;
+
+  return self;
+}
+
+/**
+ * gw_radix_tree_copy:
+ * @self: a #GwRadixTree
+ *
+ * Creates a deep copy of @self.
+ *
+ * Returns: (transfer full): a new #GwRadixTree
+ *
+ * Since: 0.1
+ */
+GwRadixTree*
+gw_radix_tree_copy (GwRadixTree *self)
+{
+  GwRadixTree *copy;
+
+  g_return_val_if_fail (self, NULL);
+  g_return_val_if_fail (self->ref_count, NULL);
+
+  copy = gw_radix_tree_new ();
+
+  return copy;
+}
+
+GwRadixTree*
+gw_radix_tree_ref (GwRadixTree *self)
+{
+  g_return_val_if_fail (self, NULL);
+  g_return_val_if_fail (self->ref_count, NULL);
+
+  g_atomic_int_inc (&self->ref_count);
+
+  return self;
+}
+
+void
+gw_radix_tree_unref (GwRadixTree *self)
+{
+  g_return_if_fail (self);
+  g_return_if_fail (self->ref_count);
+
+  if (g_atomic_int_dec_and_test (&self->ref_count))
+    gw_radix_tree_free (self);
 }
 
 /**
@@ -1279,14 +1260,13 @@ gw_radix_tree_new (void)
 GwRadixTree*
 gw_radix_tree_new_with_free_func (GDestroyNotify destroy_func)
 {
-  GwRadixTreePrivate *priv;
-  GwRadixTree *tree;
+  GwRadixTree *self;
 
-  tree = gw_radix_tree_new ();
-  priv = gw_radix_tree_get_instance_private (tree);
-  priv->destroy_func = destroy_func;
+  self = g_slice_new0 (GwRadixTree);
+  self->ref_count = 1;
+  self->destroy_func = destroy_func;
 
-  return tree;
+  return self;
 }
 
 /**
@@ -1308,7 +1288,7 @@ gw_radix_tree_contains (GwRadixTree *self,
 {
   gboolean found;
 
-  g_return_val_if_fail (GW_IS_RADIX_TREE (self), FALSE);
+  g_return_val_if_fail (self, FALSE);
 
   gw_radix_tree_lookup (self, key, key_length, &found);
 
@@ -1336,15 +1316,13 @@ gw_radix_tree_lookup (GwRadixTree *self,
                       gsize        key_length,
                       gboolean    *found)
 {
-  GwRadixTreePrivate *priv;
   Node **child;
   Node *n;
   gint depth;
 
-  g_return_val_if_fail (GW_IS_RADIX_TREE (self), NULL);
+  g_return_val_if_fail (self, NULL);
 
-  priv = gw_radix_tree_get_instance_private (self);
-  n = priv->root;
+  n = self->root;
   depth = 0;
 
   if (key_length == -1)
@@ -1404,17 +1382,15 @@ gw_radix_tree_insert (GwRadixTree *self,
                       gsize        key_length,
                       gpointer     value)
 {
-  GwRadixTreePrivate *priv;
   gpointer old_val;
   gboolean old;
 
-  g_return_val_if_fail (GW_IS_RADIX_TREE (self), FALSE);
+  g_return_val_if_fail (self, FALSE);
 
-  priv = gw_radix_tree_get_instance_private (self);
   old = FALSE;
 
-  old_val = insert_recursive (priv->root,
-                              &(priv->root),
+  old_val = insert_recursive (self->root,
+                              &self->root,
                               (const guchar*) key,
                               key_length == -1 ? strlen (key) : key_length,
                               value,
@@ -1422,7 +1398,7 @@ gw_radix_tree_insert (GwRadixTree *self,
                               &old);
 
   if (!old_val)
-    priv->size++;
+    self->size++;
 
   return !old_val;
 }
@@ -1442,7 +1418,7 @@ gw_radix_tree_get_keys (GwRadixTree *self)
 {
   GPtrArray *result;
 
-  g_return_val_if_fail (GW_IS_RADIX_TREE (self), NULL);
+  g_return_val_if_fail (self, NULL);
 
   result = g_ptr_array_new ();
 
@@ -1469,7 +1445,7 @@ gw_radix_tree_get_values (GwRadixTree *self)
 {
   GPtrArray *result;
 
-  g_return_val_if_fail (GW_IS_RADIX_TREE (self), NULL);
+  g_return_val_if_fail (self, NULL);
 
   result = g_ptr_array_new ();
 
@@ -1497,13 +1473,9 @@ gw_radix_tree_iter (GwRadixTree *self,
                     RadixTreeCb  callback,
                     gpointer     user_data)
 {
-  GwRadixTreePrivate *priv;
+  g_return_val_if_fail (self, FALSE);
 
-  g_return_val_if_fail (GW_IS_RADIX_TREE (self), FALSE);
-
-  priv = gw_radix_tree_get_instance_private (self);
-
-  return iter_recursive (priv->root, callback, user_data);
+  return iter_recursive (self->root, callback, user_data);
 }
 
 /**
@@ -1522,26 +1494,24 @@ gw_radix_tree_remove (GwRadixTree *self,
                       const gchar *key,
                       gsize        key_length)
 {
-  GwRadixTreePrivate *priv;
   Leaf *removed;
 
-  g_return_if_fail (GW_IS_RADIX_TREE (self));
+  g_return_if_fail (self);
 
-  priv = gw_radix_tree_get_instance_private (self);
-  removed = remove_recursive (priv->root,
-                              &priv->root,
+  removed = remove_recursive (self->root,
+                              &self->root,
                               (guchar*) key,
                               key_length == -1 ? strlen (key) : key_length,
                               0);
 
   if (removed)
     {
-      if (priv->destroy_func && removed->value)
-        priv->destroy_func (removed->value);
+      if (self->destroy_func && removed->value)
+        self->destroy_func (removed->value);
 
       g_free (removed);
 
-      priv->size--;
+      self->size--;
     }
 }
 
@@ -1561,14 +1531,12 @@ gw_radix_tree_steal (GwRadixTree *self,
                      const gchar *key,
                      gsize        key_length)
 {
-  GwRadixTreePrivate *priv;
   Leaf *removed;
 
-  g_return_if_fail (GW_IS_RADIX_TREE (self));
+  g_return_if_fail (self);
 
-  priv = gw_radix_tree_get_instance_private (self);
-  removed = remove_recursive (priv->root,
-                              &priv->root,
+  removed = remove_recursive (self->root,
+                              &self->root,
                               (guchar*) key,
                               key_length == -1 ? strlen (key) : key_length,
                               0);
@@ -1576,7 +1544,7 @@ gw_radix_tree_steal (GwRadixTree *self,
   if (removed)
     {
       g_free (removed);
-      priv->size--;
+      self->size--;
     }
 }
 
@@ -1591,15 +1559,11 @@ gw_radix_tree_steal (GwRadixTree *self,
 void
 gw_radix_tree_clear (GwRadixTree *self)
 {
-  GwRadixTreePrivate *priv;
+  g_return_if_fail (self);
 
-  g_return_if_fail (GW_IS_RADIX_TREE (self));
-
-  priv = gw_radix_tree_get_instance_private (self);
-
-  destroy_node_recursive (priv->root);
-  priv->root = NULL;
-  priv->size = 0;
+  destroy_node_recursive (self->root);
+  self->root = NULL;
+  self->size = 0;
 }
 
 /**
@@ -1615,11 +1579,7 @@ gw_radix_tree_clear (GwRadixTree *self)
 gint
 gw_radix_tree_get_size (GwRadixTree *self)
 {
-  GwRadixTreePrivate *priv;
+  g_return_val_if_fail (self, -1);
 
-  g_return_val_if_fail (GW_IS_RADIX_TREE (self), -1);
-
-  priv = gw_radix_tree_get_instance_private (self);
-
-  return priv->size;
+  return self->size;
 }

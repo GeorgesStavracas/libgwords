@@ -94,18 +94,12 @@ load_gfile_in_thread_cb (GTask        *task,
 }
 
 static void
-tree_size_changed_cb (GwDictionary *self)
-{
-  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SIZE]);
-}
-
-static void
 gw_dictionary_finalize (GObject *object)
 {
   GwDictionary *self = (GwDictionary *)object;
   GwDictionaryPrivate *priv = gw_dictionary_get_instance_private (self);
 
-  g_clear_object (&priv->tree);
+  g_clear_pointer (&priv->tree, gw_radix_tree_unref);
 
   G_OBJECT_CLASS (gw_dictionary_parent_class)->finalize (object);
 }
@@ -159,11 +153,11 @@ gw_dictionary_class_init (GwDictionaryClass *klass)
    *
    * Since: 0.1.0
    */
-  properties[PROP_RADIX_TREE] = g_param_spec_object ("radix-tree",
-                                                     "Radix tree",
-                                                     "The internal radix tree of this dictionary",
-                                                     GW_TYPE_RADIX_TREE,
-                                                     G_PARAM_READABLE);
+  properties[PROP_RADIX_TREE] = g_param_spec_boxed ("radix-tree",
+                                                    "Radix tree",
+                                                    "The internal radix tree of this dictionary",
+                                                    GW_TYPE_RADIX_TREE,
+                                                    G_PARAM_READABLE);
 
   /**
    * GwDictionary:size:
@@ -189,11 +183,6 @@ gw_dictionary_init (GwDictionary *self)
   GwDictionaryPrivate *priv = gw_dictionary_get_instance_private (self);
 
   priv->tree = gw_radix_tree_new ();
-
-  g_signal_connect (priv->tree,
-                    "notify::size",
-                    G_CALLBACK (tree_size_changed_cb),
-                    self);
 }
 
 /**
