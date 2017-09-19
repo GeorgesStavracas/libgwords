@@ -483,6 +483,7 @@ gw_document_realize_sync (GwDocument    *self,
                           GError       **error)
 {
   g_return_val_if_fail (GW_IS_DOCUMENT (self), NULL);
+  g_return_val_if_fail (!error || !*error, FALSE);
 
   return GW_DOCUMENT_CLASS (G_OBJECT_CLASS (self))->realize (self, cancellable, error);
 }
