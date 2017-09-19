@@ -5,7 +5,16 @@ deps = [
   gio_dep,
 ]
 
+gw_include_dirs = [
+  include_directories('..'),
+  include_directories('.'),
+  include_directories('string'),
+]
+
 libgwords_headers = [
+  'string/gw-string.h',
+  'string/gw-string-comparator.h',
+  'string/gw-string-editor.h',
   'gwords.h',
   'gw-dictionary.h',
   'gw-document.h',
@@ -15,8 +24,6 @@ libgwords_headers = [
   'gw-modifier.h',
   'gw-radix-tree.h',
   'gw-segmenter.h',
-  'gw-string.h',
-  'gw-string-editor.h',
   'gw-types.h',
   'gw-utils.h',
 ]
@@ -25,6 +32,9 @@ libgwords_sources = files(
   'languages/C/gw-document-fallback.c',
   'languages/C/gw-segmenter-fallback.c',
   'languages/pt_BR/gw-segmenter-pt-br.c',
+  'string/gw-string.c',
+  'string/gw-string-comparator.c',
+  'string/gw-string-editor.c',
   'gw-dictionary.c',
   'gw-document.c',
   'gw-group.c',
@@ -33,8 +43,6 @@ libgwords_sources = files(
   'gw-modifier.c',
   'gw-radix-tree.c',
   'gw-segmenter.c',
-  'gw-string.c',
-  'gw-string-editor.c',
   'gw-task-helper.c',
   'gw-utils.c',
 )
@@ -69,7 +77,7 @@ libgwords = shared_library(
               version: gw_major_version,
           install_dir: gw_libdir,
         install_rpath: gw_libdir_abs,
-  include_directories: [ include_directories('.'), include_directories('..') ],
+  include_directories: gw_include_dirs,
          dependencies: deps,
               install: true
 )

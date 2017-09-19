@@ -27,9 +27,10 @@ configure_file(
 ##############
 
 test_dictionary = executable(
-  'test-dictionary',
+    'test-dictionary',
   'test-dictionary.c',
-  dependencies: libgwords_dep,
+         dependencies: libgwords_dep,
+  include_directories: gw_include_dirs,
 )
 
 test('test-dictionary', test_dictionary)
@@ -42,7 +43,8 @@ test('test-dictionary', test_dictionary)
 test_document = executable(
   'test-document',
   [ 'stub-modifier.c', 'test-document.c' ],
-  dependencies: libgwords_dep,
+         dependencies: libgwords_dep,
+  include_directories: gw_include_dirs,
 )
 
 test('test-document', test_document)
@@ -54,7 +56,8 @@ test('test-document', test_document)
 test_language = executable(
   'test-language',
   'test-language.c',
-  dependencies: libgwords_dep,
+         dependencies: libgwords_dep,
+  include_directories: gw_include_dirs,
 )
 
 test('test-language', test_language)
@@ -67,7 +70,8 @@ test('test-language', test_language)
 test_radix_tree = executable(
   'test-radix-tree',
   'test-radix-tree.c',
-  dependencies: libgwords_dep,
+         dependencies: libgwords_dep,
+  include_directories: gw_include_dirs,
 )
 
 test('test-radix-tree', test_radix_tree, timeout: 60)
@@ -80,7 +84,8 @@ test('test-radix-tree', test_radix_tree, timeout: 60)
 test_segmenters = executable(
   'test-segmenters',
   'test-segmenters.c',
-  dependencies: libgwords_dep,
+         dependencies: libgwords_dep,
+  include_directories: gw_include_dirs,
 )
 
 test('test-segmenters', test_segmenters)
@@ -93,10 +98,25 @@ test('test-segmenters', test_segmenters)
 test_string = executable(
   'test-string',
   'test-string.c',
-  dependencies: libgwords_dep,
+         dependencies: libgwords_dep,
+  include_directories: gw_include_dirs,
 )
 
 test('test-string', test_string)
+
+
+#####################
+# String comparator #
+#####################
+
+test_string_comparator = executable(
+  'test-string-comparator',
+  'test-string-comparator.c',
+         dependencies: libgwords_dep,
+  include_directories: gw_include_dirs,
+)
+
+test('test-string-comparator', test_string_comparator, timeout: 60)
 
 
 #################
@@ -106,7 +126,8 @@ test('test-string', test_string)
 test_string_editor = executable(
   'test-string-editor',
   'test-string-editor.c',
-  dependencies: libgwords_dep,
+            dependencies: libgwords_dep,
+     include_directories: gw_include_dirs,
 )
 
 test('test-string-editor', test_string_editor, timeout: 60)
