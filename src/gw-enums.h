@@ -1,4 +1,4 @@
-/* gw-types.h
+/* gw-enums.h
  *
  * Copyright (C) 2017 Georges Basile Stavracas Neto <georges.stavracas@gmail.com>
  *
@@ -16,26 +16,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GW_TYPES_H
-#define GW_TYPES_H
-
-#include "gw-enums.h"
+#ifndef GW_ENUMS_H
+#define GW_ENUMS_H
 
 #include <glib.h>
 
 G_BEGIN_DECLS
 
-typedef struct       _GwDictionary                   GwDictionary;
-typedef struct       _GwDocument                     GwDocument;
-typedef struct       _GwLanguage                     GwLanguage;
-typedef struct       _GwModifier                     GwModifier;
-typedef struct       _GwRadixTree                    GwRadixTree;
-typedef struct       _GwSegmenter                    GwSegmenter;
-typedef              gchar                           GwString;
-typedef struct       _GwStringEditor                 GwStringEditor;
-typedef struct       _GwWord                         GwWord;
+typedef enum
+{
+  GW_GRAMMAR_CLASS_INVALID      = -1,
+  GW_GRAMMAR_CLASS_ADJECTIVE    =  1 << 0,
+  GW_GRAMMAR_CLASS_ADPOSITION   =  1 << 1,
+  GW_GRAMMAR_CLASS_ADVERB       =  1 << 2,
+  GW_GRAMMAR_CLASS_ARTICLE      =  1 << 3,
+  GW_GRAMMAR_CLASS_CONJUNCTION  =  1 << 4,
+  GW_GRAMMAR_CLASS_INTERJECTION =  1 << 5,
+  GW_GRAMMAR_CLASS_NOUN         =  1 << 6,
+  GW_GRAMMAR_CLASS_NUMERAL      =  1 << 7,
+  GW_GRAMMAR_CLASS_PRONOUN      =  1 << 8,
+  GW_GRAMMAR_CLASS_VERB         =  1 << 9,
+  GW_GRAMMAR_CLASS_OTHER        =  1 << 10,
+
+  /* Special value for dictionary lookup */
+  GW_GRAMMAR_CLASS_ALL          = 1 << 11,
+} GwGrammarClass;
+
 
 
 G_END_DECLS
 
-#endif /* GW_TYPES_H */
+#endif /* GW_ENUMS_H */

@@ -37,6 +37,7 @@ G_BEGIN_DECLS
 # include "gw-string-editor.h"
 # include "gw-utils.h"
 # include "gw-version.h"
+# include "gw-word.h"
 #undef GW_INSIDE
 
 G_END_DECLS

@@ -1,4 +1,4 @@
-/* gw-types.h
+/* gw-node.h
  *
  * Copyright (C) 2017 Georges Basile Stavracas Neto <georges.stavracas@gmail.com>
  *
@@ -16,26 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GW_TYPES_H
-#define GW_TYPES_H
-
-#include "gw-enums.h"
+#ifndef GW_NODE_H
+#define GW_NODE_H
 
 #include <glib.h>
 
 G_BEGIN_DECLS
 
-typedef struct       _GwDictionary                   GwDictionary;
-typedef struct       _GwDocument                     GwDocument;
-typedef struct       _GwLanguage                     GwLanguage;
-typedef struct       _GwModifier                     GwModifier;
-typedef struct       _GwRadixTree                    GwRadixTree;
-typedef struct       _GwSegmenter                    GwSegmenter;
-typedef              gchar                           GwString;
-typedef struct       _GwStringEditor                 GwStringEditor;
-typedef struct       _GwWord                         GwWord;
-
+#define              GW_NODE(n)                                  ((GNode*) n)
 
 G_END_DECLS
 
-#endif /* GW_TYPES_H */
+#endif /* GW_NODE_H */

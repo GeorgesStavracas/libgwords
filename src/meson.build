@@ -9,15 +9,18 @@ gw_include_dirs = [
   include_directories('..'),
   include_directories('.'),
   include_directories('string'),
+  include_directories('words'),
 ]
 
 libgwords_headers = [
   'string/gw-string.h',
   'string/gw-string-comparator.h',
   'string/gw-string-editor.h',
+  'words/gw-word.h',
   'gwords.h',
   'gw-dictionary.h',
   'gw-document.h',
+  'gw-enums.h',
   'gw-extension-points.h',
   'gw-group.h',
   'gw-language.h',
@@ -35,6 +38,7 @@ libgwords_sources = files(
   'string/gw-string.c',
   'string/gw-string-comparator.c',
   'string/gw-string-editor.c',
+  'words/gw-word.c',
   'gw-dictionary.c',
   'gw-document.c',
   'gw-group.c',
@@ -64,6 +68,22 @@ configure_file(
     install_dir: join_paths(get_option('prefix'), get_option('includedir'), gw_versioned_name),
   configuration: version_data
 )
+
+
+#########
+# Enums #
+#########
+
+gnome = import('gnome')
+
+ enum_sources = gnome.mkenums(
+    'gw-enum-types',
+          sources: files('gw-enums.h'),
+       c_template: 'gw-enum-types.c.template',
+       h_template: 'gw-enum-types.h.template',
+)
+
+libgwords_sources += enum_sources
 
 
 #############

@@ -1,4 +1,4 @@
-/* gw-types.h
+/* gw-word.h
  *
  * Copyright (C) 2017 Georges Basile Stavracas Neto <georges.stavracas@gmail.com>
  *
@@ -16,26 +16,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GW_TYPES_H
-#define GW_TYPES_H
+#ifndef GW_WORD_H
+#define GW_WORD_H
 
-#include "gw-enums.h"
-
-#include <glib.h>
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 
-typedef struct       _GwDictionary                   GwDictionary;
-typedef struct       _GwDocument                     GwDocument;
-typedef struct       _GwLanguage                     GwLanguage;
-typedef struct       _GwModifier                     GwModifier;
-typedef struct       _GwRadixTree                    GwRadixTree;
-typedef struct       _GwSegmenter                    GwSegmenter;
-typedef              gchar                           GwString;
-typedef struct       _GwStringEditor                 GwStringEditor;
-typedef struct       _GwWord                         GwWord;
+#define GW_TYPE_WORD (gw_word_get_type())
 
+typedef struct _GwWord GwWord;
+
+GwWord*              gw_word_new                                 (void);
+
+GwWord*              gw_word_copy                                (GwWord             *self);
+
+GwWord*              gw_word_ref                                 (GwWord             *self);
+
+void                 gw_word_unref                               (GwWord             *self);
+
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (GwWord, gw_word_unref)
 
 G_END_DECLS
 
-#endif /* GW_TYPES_H */
+#endif /* GW_WORD_H */
+

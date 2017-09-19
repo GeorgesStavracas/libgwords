@@ -23,6 +23,8 @@
 # error "Only <gwords.h> can be included directly."
 #endif
 
+#include "gw-types.h"
+
 #include <glib-object.h>
 #include <gio/gio.h>
 
@@ -35,6 +37,12 @@ G_DECLARE_DERIVABLE_TYPE (GwDictionary, gw_dictionary, GW, DICTIONARY, GObject)
 struct _GwDictionaryClass
 {
   GObjectClass        parent;
+
+  GwWord*            (*lookup)                                   (GwDictionary       *self,
+                                                                  GwGrammarClass      word_class,
+                                                                  GwString           *word,
+                                                                  gsize               word_len);
+
 };
 
 GwDictionary*        gw_dictionary_new                           (void);
