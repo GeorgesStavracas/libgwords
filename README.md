@@ -28,26 +28,29 @@ This is a tentative roadmap of how to achieve the goals of libgwords. Since it's
 an auxiliary library that I'm building as part of (but not limited to) my masters
 program, this can change during the development.
 
-### Phase 1
+### Phase 1 ✓
 
  - [x] Adaptative Radix Tree
    - [x] GwRadixTree
  - [x] Dictionaries
-   - [x] GwDictionary
+   - [x] GwDictionary (stub)
  - [x] Word segmentation
    - [x] GwSegmenter
    - [x] GwSegmenterFallback
    - [x] GwSegmenterPtBr
  - [x] Refcounted strings
    - [x] GwString
- - [ ] Sentence manipulation
-   - [ ] GwSentence
-   - [ ] GwSentenceModifier
+ - [x] Sentence manipulation
+   - [x] GwStringEditor
 
 ### Phase 2
 
+ - [ ] Grammar abstraction
  - [ ] Grammar decomposition
- - [ ] Root extractor
- - [ ] Noun conjugation
+ - [ ] Language abstractions
+   - [ ] GwMark
+   - [ ] GwParagraph
+   - [ ] GwSentence
    - [ ] GwWord
-   - [ ] GwNoun
+ - [ ] Dictionaries
+   - [ ] Word lookup
