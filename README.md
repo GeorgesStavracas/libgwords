@@ -45,6 +45,14 @@ program, this can change during the development.
 
 ### Phase 2
 
+ - [ ] Language abstractions
+   - [ ] GwGrammarClass
+   - [ ] GwWord
+ - [ ] Dictionaries
+   - [ ] Word lookup
+
+### Phase 3
+
  - [ ] Grammar abstraction
  - [ ] Grammar decomposition
  - [ ] Language abstractions
