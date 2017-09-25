@@ -32,8 +32,10 @@ libgwords_headers = [
 ]
 
 libgwords_sources = files(
+  'languages/C/gw-dictionary-fallback.c',
   'languages/C/gw-document-fallback.c',
   'languages/C/gw-segmenter-fallback.c',
+  'languages/pt_BR/gw-dictionary-pt-br.c',
   'languages/pt_BR/gw-segmenter-pt-br.c',
   'string/gw-string.c',
   'string/gw-string-comparator.c',

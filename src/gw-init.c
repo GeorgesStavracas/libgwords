@@ -21,17 +21,35 @@
 #include "gw-extension-points.h"
 #include "gw-segmenter.h"
 
+#include "gw-init-dictionaries.h"
 #include "gw-init-documents.h"
 #include "gw-init-segmenters.h"
 
 #include <gio/gio.h>
 
 static void
+init_dictionaries (void)
+{
+  GIOExtensionPoint *extension_point;
+
+  /* Extension point for GwDictionary */
+  extension_point = g_io_extension_point_register (GW_EXTENSION_POINT_DICTIONARY);
+  g_io_extension_point_set_required_type (extension_point, GW_TYPE_DICTIONARY);
+
+#define implement_dictionary(T,lang,priority) g_io_extension_point_implement (GW_EXTENSION_POINT_DICTIONARY, T, lang, priority)
+
+  implement_dictionary (GW_TYPE_DICTIONARY_FALLBACK, "fallback", 10);
+  implement_dictionary (GW_TYPE_DICTIONARY_FALLBACK, "fallback", 10);
+
+#undef implement_document
+}
+
+static void
 init_documents (void)
 {
   GIOExtensionPoint *extension_point;
 
-  /* Extension point for GwSegmenter */
+  /* Extension point for GwDocument */
   extension_point = g_io_extension_point_register (GW_EXTENSION_POINT_DOCUMENT);
   g_io_extension_point_set_required_type (extension_point, GW_TYPE_DOCUMENT);
 
@@ -41,7 +59,6 @@ init_documents (void)
 
 #undef implement_document
 }
-
 
 static void
 init_segmenters (void)
@@ -70,6 +87,7 @@ G_DEFINE_CONSTRUCTOR (_gw_init)
 static void
 _gw_init (void)
 {
+  init_dictionaries ();
   init_documents ();
   init_segmenters ();
 }

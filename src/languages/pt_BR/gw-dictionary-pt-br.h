@@ -1,4 +1,4 @@
-/* gw-extension-points.h
+/* gw-dictionary-pt-br.h
  *
  * Copyright (C) 2017 Georges Basile Stavracas Neto <georges.stavracas@gmail.com>
  *
@@ -16,17 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GW_EXTENSION_POINTS_H
-#define GW_EXTENSION_POINTS_H
+#ifndef GW_DICTIONARY_PT_BR_H
+#define GW_DICTIONARY_PT_BR_H
 
-#include <glib.h>
+#include "gwords.h"
 
 G_BEGIN_DECLS
 
-#define GW_EXTENSION_POINT_DICTIONARY        "gw-dictionary-ep"
-#define GW_EXTENSION_POINT_DOCUMENT          "gw-document-ep"
-#define GW_EXTENSION_POINT_SEGMENTER         "gw-segmenter-ep"
+#define GW_TYPE_DICTIONARY_PT_BR (gw_dictionary_pt_br_get_type())
+
+G_DECLARE_FINAL_TYPE (GwDictionaryPtBr, gw_dictionary_pt_br, GW, DICTIONARY_PT_BR, GwDictionary)
+
+GwDictionaryPtBr*    gw_dictionary_pt_br_new                     (void);
 
 G_END_DECLS
 
-#endif /* GW_EXTENSION_POINTS_H */
+#endif /* GW_DICTIONARY_PT_BR_H */
+

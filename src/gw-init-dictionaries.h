@@ -1,4 +1,4 @@
-/* gw-extension-points.h
+/* gw-init-dictionaries.h
  *
  * Copyright (C) 2017 Georges Basile Stavracas Neto <georges.stavracas@gmail.com>
  *
@@ -16,17 +16,5 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GW_EXTENSION_POINTS_H
-#define GW_EXTENSION_POINTS_H
-
-#include <glib.h>
-
-G_BEGIN_DECLS
-
-#define GW_EXTENSION_POINT_DICTIONARY        "gw-dictionary-ep"
-#define GW_EXTENSION_POINT_DOCUMENT          "gw-document-ep"
-#define GW_EXTENSION_POINT_SEGMENTER         "gw-segmenter-ep"
-
-G_END_DECLS
-
-#endif /* GW_EXTENSION_POINTS_H */
+#include "languages/C/gw-dictionary-fallback.h"
+#include "languages/pt_BR/gw-dictionary-pt-br.h"

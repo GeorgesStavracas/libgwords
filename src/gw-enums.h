@@ -42,7 +42,25 @@ typedef enum
   GW_GRAMMAR_CLASS_ALL          = 1 << 11,
 } GwGrammarClass;
 
+typedef enum
+{
+  GW_WORD_PERIOD_PAST,
+  GW_WORD_PERIOD_PRESENT,
+  GW_WORD_PERIOD_FUTURE,
+  GW_WORD_PERIOD_INDETERMINED,
+} GwWordPeriod;
 
+typedef enum
+{
+  GW_WORD_STATE_CONDITIONAL,
+  GW_WORD_STATE_COMPLETED,
+  GW_WORD_STATE_ONGOING,
+} GwWordState;
+
+typedef enum
+{
+  GW_VERB_MODE_
+} GwVerbMode;
 
 G_END_DECLS
 

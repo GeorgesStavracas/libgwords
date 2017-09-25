@@ -38,6 +38,11 @@ struct _GwDictionaryClass
 {
   GObjectClass        parent;
 
+  gboolean           (*load)                                     (GwDictionary       *self);
+
+
+  gboolean           (*unload)                                   (GwDictionary       *self);
+
   GwWord*            (*lookup)                                   (GwDictionary       *self,
                                                                   GwGrammarClass      word_class,
                                                                   GwString           *word,
@@ -45,69 +50,12 @@ struct _GwDictionaryClass
 
 };
 
-GwDictionary*        gw_dictionary_new                           (void);
+GwLanguage*          gw_dictionary_get_language                  (GwDictionary       *self);
 
-gboolean             gw_dictionary_contains                      (GwDictionary       *self,
-                                                                  const gchar        *word,
+GwWord*              gw_dictionary_lookup                        (GwDictionary       *self,
+                                                                  GwGrammarClass      word_class,
+                                                                  GwString           *word,
                                                                   gsize               word_length);
-
-void                 gw_dictionary_insert                        (GwDictionary       *self,
-                                                                  const gchar        *word,
-                                                                  gsize               word_length);
-
-void                 gw_dictionary_remove                        (GwDictionary       *self,
-                                                                  const gchar        *word,
-                                                                  gsize               word_length);
-
-void                 gw_dictionary_load_from_file                (GwDictionary        *self,
-                                                                  const gchar         *file_path,
-                                                                  const gchar         *delimiter,
-                                                                  GAsyncReadyCallback  callback,
-                                                                  GCancellable        *cancellable,
-                                                                  gpointer             user_data);
-
-gboolean             gw_dictionary_load_from_file_finish         (GAsyncResult       *result,
-                                                                  GError            **error);
-
-gboolean             gw_dictionary_load_from_file_sync           (GwDictionary       *self,
-                                                                  const gchar        *file_path,
-                                                                  const gchar        *delimiter,
-                                                                  GCancellable       *cancellable,
-                                                                  GError            **error);
-
-
-void                 gw_dictionary_load_from_resource            (GwDictionary        *self,
-                                                                  const gchar         *resource_path,
-                                                                  const gchar         *delimiter,
-                                                                  GAsyncReadyCallback  callback,
-                                                                  GCancellable        *cancellable,
-                                                                  gpointer             user_data);
-
-gboolean             gw_dictionary_load_from_resource_finish     (GAsyncResult       *result,
-                                                                  GError            **error);
-
-gboolean             gw_dictionary_load_from_resource_sync       (GwDictionary       *self,
-                                                                  const gchar        *resource_path,
-                                                                  const gchar        *delimiter,
-                                                                  GCancellable       *cancellable,
-                                                                  GError            **error);
-
-
-void                 gw_dictionary_load_from_gfile               (GwDictionary        *self,
-                                                                  GFile               *file,
-                                                                  const gchar         *delimiter,
-                                                                  GAsyncReadyCallback  callback,
-                                                                  GCancellable        *cancellable,
-                                                                  gpointer             user_data);
-
-gboolean             gw_dictionary_load_from_gfile_finish        (GAsyncResult       *result,
-                                                                  GError            **error);
-
-gboolean             gw_dictionary_load_from_gfile_sync          (GwDictionary       *self,
-                                                                  GFile              *file,
-                                                                  const gchar        *delimiter,
-                                                                  GCancellable       *cancellable,
-                                                                  GError            **error);
 
 G_END_DECLS
 

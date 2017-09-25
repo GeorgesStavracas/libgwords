@@ -1,4 +1,4 @@
-/* gw-extension-points.h
+/* gw-dictionary-private.h
  *
  * Copyright (C) 2017 Georges Basile Stavracas Neto <georges.stavracas@gmail.com>
  *
@@ -16,17 +16,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GW_EXTENSION_POINTS_H
-#define GW_EXTENSION_POINTS_H
+#ifndef GW_DICTIONARY_PRIVATE_H
+#define GW_DICTIONARY_PRIVATE_H
 
 #include <glib.h>
 
 G_BEGIN_DECLS
 
-#define GW_EXTENSION_POINT_DICTIONARY        "gw-dictionary-ep"
-#define GW_EXTENSION_POINT_DOCUMENT          "gw-document-ep"
-#define GW_EXTENSION_POINT_SEGMENTER         "gw-segmenter-ep"
+gboolean             gw_dictionary_load                          (GwDictionary       *self);
+
+gboolean             gw_dictionary_unload                        (GwDictionary       *self);
+
 
 G_END_DECLS
 
-#endif /* GW_EXTENSION_POINTS_H */
+#endif /* GW_DICTIONARY_PRIVATE_H */

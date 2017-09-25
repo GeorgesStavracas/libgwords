@@ -18,6 +18,7 @@
 
 #include "config.h"
 #include "gw-dictionary.h"
+#include "gw-dictionary-private.h"
 #include "gw-extension-points.h"
 #include "gw-language.h"
 #include "gw-radix-tree.h"
@@ -92,71 +93,30 @@ create_document_in_thread_cb (GTask        *task,
  * Auxiliary methods
  */
 
-static gboolean
-load_dictionary_file_at_path (GwLanguage  *self,
-                              const gchar *path)
-{
-  GError *error;
-  g_autofree gchar *dict_file;
-  g_autofree gchar *filepath;
-
-  /* TODO: if fail to find lang_REGION.gwdict, try only lang.gwdict */
-  error = NULL;
-  dict_file = g_strdup_printf ("%s.gwdict", self->code);
-  filepath = g_build_filename (path, dict_file, NULL);
-
-  if (!g_file_test (filepath, G_FILE_TEST_EXISTS) || !g_file_test (filepath, G_FILE_TEST_IS_REGULAR))
-    return FALSE;
-
-  /* Setup the dictionary */
-  g_debug ("Loading dictionary file: %s", filepath);
-
-  self->dictionary = gw_dictionary_new ();
-
-  if (!gw_dictionary_load_from_file_sync (self->dictionary,
-                                          filepath,
-                                          NULL,
-                                          NULL,
-                                          &error))
-    {
-      g_warning ("Error loading dictionary: %s", error->message);
-      g_clear_error (&error);
-      return FALSE;
-    }
-
-  return TRUE;
-}
-
 static void
 setup_dictionary (GwLanguage *self)
 {
-  const gchar * const * system_data_dirs;
-  g_autofree gchar *user_data_dir;
 
-  /* Try 1: g_get_user_data_dir */
-  user_data_dir = g_build_filename (g_get_user_data_dir (), GW_PACKAGE_NAME, NULL);
+  GIOExtensionPoint *extension_point;
+  GIOExtension *dict_extension;
 
-  if (load_dictionary_file_at_path (self, user_data_dir))
-    goto out;
+  extension_point = g_io_extension_point_lookup (GW_EXTENSION_POINT_DICTIONARY);
+  dict_extension = g_io_extension_point_get_extension_by_name (extension_point, self->code);
 
-  /* Try 2: g_get_system_data_dirs */
-  system_data_dirs = g_get_system_data_dirs ();
+  if (!dict_extension)
+    dict_extension = g_io_extension_point_get_extension_by_name (extension_point, "fallback");
 
-  for (; system_data_dirs && *system_data_dirs; system_data_dirs++)
-    {
-      g_autofree gchar *real_datadir;
-      const gchar *datadir;
 
-      datadir = *system_data_dirs;
-      real_datadir = g_build_filename (datadir, GW_PACKAGE_NAME, NULL);
 
-      if (load_dictionary_file_at_path (self, real_datadir))
-        goto out;
-    }
+  self->dictionary = g_object_new (g_io_extension_get_type (dict_extension),
+                                   "language", self,
+                                   NULL);
 
-out:
-  if (self->dictionary)
-    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_DICTIONARY]);
+  g_debug ("Loading dictionary: %s", g_type_name (g_io_extension_get_type (dict_extension)));
+
+  gw_dictionary_load (self->dictionary);
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_DICTIONARY]);
 }
 
 static void
@@ -173,7 +133,7 @@ setup_segmenter (GwLanguage *self)
 
   self->segmenter = g_object_new (g_io_extension_get_type (segmenter_extension),
                                   "language", self,
-                                   NULL);
+                                  NULL);
 
   g_debug ("Loading segmenter: %s", g_type_name (g_io_extension_get_type (segmenter_extension)));
 
@@ -269,6 +229,7 @@ gw_language_finalize (GObject *object)
 {
   GwLanguage *self = (GwLanguage *)object;
 
+  g_clear_object (&self->dictionary);
   g_clear_pointer (&self->code, g_free);
   g_clear_object (&self->segmenter);
 

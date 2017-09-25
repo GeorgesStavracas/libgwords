@@ -19,6 +19,8 @@
 #ifndef GW_WORD_H
 #define GW_WORD_H
 
+#include "gw-types.h"
+
 #include <glib-object.h>
 
 G_BEGIN_DECLS
@@ -27,13 +29,22 @@ G_BEGIN_DECLS
 
 typedef struct _GwWord GwWord;
 
-GwWord*              gw_word_new                                 (void);
+GwWord*              gw_word_new                                 (GwString           *word,
+                                                                  GwGrammarClass      word_class,
+                                                                  GwWordPeriod        period,
+                                                                  GwWordState         state);
 
 GwWord*              gw_word_copy                                (GwWord             *self);
 
 GwWord*              gw_word_ref                                 (GwWord             *self);
 
 void                 gw_word_unref                               (GwWord             *self);
+
+GwWordPeriod         gw_word_get_period                          (GwWord             *self);
+
+GwWordState          gw_word_get_state                           (GwWord             *self);
+
+GwString*            gw_word_get_string                          (GwWord             *self);
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (GwWord, gw_word_unref)
 
