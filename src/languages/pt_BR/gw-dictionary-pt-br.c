@@ -16,7 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "lexicon-bib.h"
+
 #include "gw-dictionary-pt-br.h"
+
+#define PREFIX "/home/feaneron/Documentos/Projetos/libgwords/data/words/"
 
 struct _GwDictionaryPtBr
 {
@@ -27,12 +31,44 @@ G_DEFINE_TYPE (GwDictionaryPtBr, gw_dictionary_pt_br, GW_TYPE_DICTIONARY)
 
 
 /*
+ * Auxiliary functions
+ */
+
+static gboolean
+parse_unitex_output (GwDictionaryPtBr *self,
+                     const gchar      *target,
+                     GwWordPeriod     *period,
+                     GwWordState      *state)
+{
+
+
+  if (!*target)
+    return FALSE;
+
+  return TRUE;
+}
+
+
+/*
  * GwDictionary overrides
  */
 
 static gboolean
 gw_dictionary_pt_br_load (GwDictionary *dictionary)
 {
+  DIC_Status status;
+
+  /* TODO: God, please no, remove the hardcoded paths for yesterday */
+  CarregaDicionario (PREFIX "pt_BR.bin", PREFIX "pt_BR.alphabet", &status);
+
+  g_message ("Loading '%s'", PREFIX "pt_BR.bin");
+
+  if (status != DIC_Status_OK)
+    {
+      g_warning ("Error loading dictionary");
+      return FALSE;
+    }
+
   return TRUE;
 }
 
@@ -42,12 +78,22 @@ gw_dictionary_pt_br_lookup (GwDictionary   *dictionary,
                             GwString       *word,
                             gsize           word_len)
 {
+  unichar uni_target[2014] = { 0, };
+  gchar target[2048] = { 0, };
+
+  DescompactaEntrada (word, uni_target);
+
+  u_to_char (target, uni_target);
+
+  g_message ("Found %s", target);
+
   return NULL;
 }
 
 static gboolean
 gw_dictionary_pt_br_unload (GwDictionary *dictionary)
 {
+  LiberaDicionario ();
   return TRUE;
 }
 

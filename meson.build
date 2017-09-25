@@ -1,6 +1,6 @@
 project(
   'libgwords',
-  'c',
+  'c', 'cpp',
   version : '0.1.0',
   license : 'LGPL3+',
   default_options : ['warning_level=1'],
@@ -67,6 +67,7 @@ add_global_arguments('-DGW_COMPILATION', language : 'c')
 
 subdir('data')
 subdir('po')
+subdir('contrib')
 subdir('src')
 subdir('tests')
 

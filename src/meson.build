@@ -3,6 +3,7 @@ libgwords_headers_dir = join_paths(gw_prefix, get_option('includedir'), gw_versi
 deps = [
   glib_dep,
   gio_dep,
+  unitex_pb_dep
 ]
 
 gw_include_dirs = [
@@ -10,6 +11,7 @@ gw_include_dirs = [
   include_directories('.'),
   include_directories('string'),
   include_directories('words'),
+  include_directories('../contrib/unitex-pb'),
 ]
 
 libgwords_headers = [
