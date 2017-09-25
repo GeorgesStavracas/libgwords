@@ -39,7 +39,7 @@ init_dictionaries (void)
 #define implement_dictionary(T,lang,priority) g_io_extension_point_implement (GW_EXTENSION_POINT_DICTIONARY, T, lang, priority)
 
   implement_dictionary (GW_TYPE_DICTIONARY_FALLBACK, "fallback", 10);
-  implement_dictionary (GW_TYPE_DICTIONARY_FALLBACK, "fallback", 10);
+  implement_dictionary (GW_TYPE_DICTIONARY_PT_BR,    "pt_BR",    10);
 
 #undef implement_document
 }
